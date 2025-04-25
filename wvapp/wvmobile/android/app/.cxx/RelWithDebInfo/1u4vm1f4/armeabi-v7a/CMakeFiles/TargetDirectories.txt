@@ -1,0 +1,2 @@
+C:/Users/Clarence/Desktop/MOBILE APP QUEUE/virtualqueuing/android/app/.cxx/RelWithDebInfo/1u4vm1f4/armeabi-v7a/CMakeFiles/edit_cache.dir
+C:/Users/Clarence/Desktop/MOBILE APP QUEUE/virtualqueuing/android/app/.cxx/RelWithDebInfo/1u4vm1f4/armeabi-v7a/CMakeFiles/rebuild_cache.dir
