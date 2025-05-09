@@ -1,0 +1,2 @@
+A:/Downloads/virtualqueuingLAMO/virtualqueuing/virtualqueuing/android/app/.cxx/Debug/6n5j274x/armeabi-v7a/CMakeFiles/edit_cache.dir
+A:/Downloads/virtualqueuingLAMO/virtualqueuing/virtualqueuing/android/app/.cxx/Debug/6n5j274x/armeabi-v7a/CMakeFiles/rebuild_cache.dir

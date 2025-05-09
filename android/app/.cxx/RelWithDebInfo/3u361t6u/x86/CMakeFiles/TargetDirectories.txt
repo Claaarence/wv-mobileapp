@@ -1,0 +1,2 @@
+A:/Downloads/wvapp/wvapp/wvmobile/android/app/.cxx/RelWithDebInfo/3u361t6u/x86/CMakeFiles/edit_cache.dir
+A:/Downloads/wvapp/wvapp/wvmobile/android/app/.cxx/RelWithDebInfo/3u361t6u/x86/CMakeFiles/rebuild_cache.dir
