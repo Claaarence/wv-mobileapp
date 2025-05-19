@@ -142,7 +142,7 @@ Expanded(
               return true;
             },
             child: ListView.builder(
-              padding: EdgeInsets.zero, // Makes sure content touches header
+             padding: const EdgeInsets.only(bottom: 150), // Makes sure content touches header
               itemCount: donations.length + (isLoading ? 1 : 0),
               itemBuilder: (context, index) {
                 if (index == donations.length && isLoading) {

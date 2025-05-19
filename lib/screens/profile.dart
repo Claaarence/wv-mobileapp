@@ -246,6 +246,7 @@ Widget build(BuildContext context) {
                                       ),
                                     ),
                                     const Spacer(),
+                                    const SizedBox(height: 20),
 
 
                                       // Edit Button

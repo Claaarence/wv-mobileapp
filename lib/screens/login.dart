@@ -24,8 +24,8 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
   late Animation<double> _glowAnimation;
   int _clickCount = 0;
   bool _isModalVisible = false;
+  bool _obscurePassword = true;
   final AudioPlayer _audioPlayer = AudioPlayer(); // 🎵 Audio player instance
-
   final AuthService _authService = AuthService();
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
@@ -291,15 +291,17 @@ Future<void> _login() async {
 
 
 
-  @override
-  Widget build(BuildContext context) {
-     ModalRoute.of(context)?.addScopedWillPopCallback(() async {
+@override
+Widget build(BuildContext context) {
+  final screenWidth = MediaQuery.of(context).size.width;
+  final screenHeight = MediaQuery.of(context).size.height;
+  ModalRoute.of(context)?.addScopedWillPopCallback(() async {
       return await showExitConfirmationDialog(context);
     });
-  final double screenWidth = MediaQuery.of(context).size.width;
-    return Scaffold(
-      body: Stack(
-        fit: StackFit.expand,
+  return Scaffold(
+    resizeToAvoidBottomInset: true, // This is default, but explicit here for clarity
+    body: Stack(
+      fit: StackFit.expand,
       children: [
         Image.asset(
           'assets/bgdash.jpg',
@@ -309,177 +311,243 @@ Future<void> _login() async {
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                const Color.fromARGB(255, 0, 0, 0).withOpacity(0.6), 
-                const Color(0xFFeb7f35).withOpacity(0.8), 
+                const Color.fromARGB(255, 0, 0, 0).withOpacity(0.6),
+                const Color(0xFFeb7f35).withOpacity(0.8),
               ],
-              stops: [0.4, 1.0], // 60% Orange, 40% Yellow
+              stops: [0.4, 1.0],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
           ),
         ),
-          Positioned(
-            top: 50,
-            left: 20,
-            child: IconButton(
-              icon: const Icon(Icons.arrow_back, color: Colors.white),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
+        Positioned(
+          top: 50,
+          left: 20,
+          child: IconButton(
+            icon: const Icon(Icons.arrow_back, color: Colors.white),
+            onPressed: () {
+              Navigator.pop(context);
+            },
           ),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              const SizedBox(height: 100),
-              GestureDetector(
-                onTap: _handleSecretClick,
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    AnimatedBuilder(
-                      animation: _glowAnimation,
-                      builder: (context, child) {
-                        return Container(
-                          width: 120,
-                          height: 120,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            gradient: RadialGradient(
-                              colors: [
-                            const Color.fromARGB(255, 255, 255, 255).withOpacity(_glowAnimation.value),
-                            const Color.fromARGB(28, 255, 255, 255),
-                              ],
-                              stops: const [0.1, 0.9],
+        ),
+        SafeArea(
+  child: LayoutBuilder(
+    builder: (context, constraints) {
+      return SingleChildScrollView(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+        ),
+        child: ConstrainedBox(
+          constraints: BoxConstraints(minHeight: constraints.maxHeight),
+          child: IntrinsicHeight(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                const SizedBox(height: 100),
+                GestureDetector(
+                  onTap: _handleSecretClick,
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      AnimatedBuilder(
+                        animation: _glowAnimation,
+                        builder: (context, child) {
+                          return Container(
+                            width: 120,
+                            height: 120,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              gradient: RadialGradient(
+                                colors: [
+                                  const Color.fromARGB(255, 255, 255, 255)
+                                      .withOpacity(_glowAnimation.value),
+                                  const Color.fromARGB(28, 255, 255, 255),
+                                ],
+                                stops: const [0.1, 0.9],
+                              ),
                             ),
-                          ),
-                        );
-                      },
-                    ),
-                    Image.asset('assets/star2.png', height: 120, width: 70),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 20),
-              Image.asset('assets/wv2.png', height: 35),
-              const SizedBox(height: 60),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
+                          );
+                        },
+                      ),
+                      Image.asset('assets/star2.png', height: 120, width: 70),
+                    ],
                   ),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                       Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              "Get Started",
-                              style: GoogleFonts.poppins(
-                                color: const Color(0xFFeb7f35),
-                                fontSize: screenWidth * 0.05,
-                                fontWeight: FontWeight.bold,
-                                letterSpacing: 0.8,
-                              ),
-                            ),
-                            Flexible(
-                              child: Image.asset(
-                                'assets/vw.png',
-                                height: screenWidth * 0.07,
-                                fit: BoxFit.contain,
-                              ),
-                            ),
-                          ],
-                        ),
-                        Divider(color: Colors.grey.withOpacity(0.6), thickness: 1),
-                        const SizedBox(height: 10),
-                        const Text("Username", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
-                        Container(
-                          decoration: BoxDecoration(
-                            color: Color.fromARGB(255, 255, 255, 255),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: TextField(
-                            controller: _usernameController,
-                            style: const TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
-                            decoration: InputDecoration(
-                             border: OutlineInputBorder(borderSide: const BorderSide(color: Color.fromARGB(255, 0, 0, 0)), borderRadius: BorderRadius.circular(10)),
-                             contentPadding: const EdgeInsets.symmetric(horizontal: 10),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 10),
-                        const Text("Password", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
-                        Container(
-                          decoration: BoxDecoration(
-                            color: Color.fromARGB(255, 255, 255, 255),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: TextField(
-                            controller: _passwordController,
-                            style: const TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
-                            decoration: InputDecoration(
-                             border: OutlineInputBorder(borderSide: const BorderSide(color: Color.fromARGB(255, 0, 0, 0)), borderRadius: BorderRadius.circular(10)),
-                             contentPadding: const EdgeInsets.symmetric(horizontal: 10),
-                            ),
-                          ),
-                        ),
-                       const SizedBox(height: 10),
-                           Divider(color: Colors.grey.withOpacity(0.6), thickness: 1),
+                ),
+                const SizedBox(height: 20),
+                Image.asset('assets/wv2.png', height: 35),
+                const SizedBox(height: 60),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.05),
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(screenWidth * 0.05),
+                    ),
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: screenWidth * 0.05,
+                        vertical: screenHeight * 0.03,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              InkWell(
-                                onTap: () {
-                                  _launchURLPrivacy(context);
-                                },
-                                child: Text(
-                                  "Privacy Policy",
-                                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: const Color.fromARGB(132, 0, 0, 0),),
+                              Text(
+                                "Get Started",
+                                style: GoogleFonts.poppins(
+                                  color: const Color(0xFFeb7f35),
+                                  fontSize: screenWidth * 0.05,
+                                  fontWeight: FontWeight.bold,
+                                  letterSpacing: 0.8,
                                 ),
                               ),
-                              InkWell(
-                                onTap: () {
-                                  _launchURLForgotPW(context);
-                                },
-                                child: Text(
-                                  "Forgot Password?",
-                                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold,  color: const Color.fromARGB(132, 0, 0, 0),),
+                              Flexible(
+                                child: Image.asset(
+                                  'assets/vw.png',
+                                  height: screenWidth * 0.07,
+                                  fit: BoxFit.contain,
                                 ),
                               ),
                             ],
                           ),
-                          const SizedBox(height: 20),
-                         ElevatedButton(
-                           onPressed: _login,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFFeb7f35),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
+                          Divider(
+                              color: Colors.grey.withOpacity(0.6), thickness: 1),
+                          SizedBox(height: screenHeight * 0.015),
+                          Text(
+                            "Username",
+                            style: TextStyle(
+                              fontSize: screenWidth * 0.03,
+                              fontWeight: FontWeight.bold,
                             ),
-                            elevation: 5,
-                            minimumSize: const Size(double.infinity, 40),
                           ),
-                          child: const Text(
-                            "Login",
-                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+                          Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(screenWidth * 0.025),
+                            ),
+                            child: TextField(
+                              controller: _usernameController,
+                              style: const TextStyle(color: Colors.black),
+                              decoration: InputDecoration(
+                                border: OutlineInputBorder(
+                                  borderSide: const BorderSide(color: Colors.black),
+                                  borderRadius:
+                                      BorderRadius.circular(screenWidth * 0.025),
+                                ),
+                                contentPadding:
+                                    EdgeInsets.symmetric(horizontal: screenWidth * 0.03),
+                              ),
+                            ),
                           ),
-                        ),
-                      ],
+                          SizedBox(height: screenHeight * 0.015),
+                          Text(
+                            "Password",
+                            style: TextStyle(
+                              fontSize: screenWidth * 0.03,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(screenWidth * 0.025),
+                            ),
+                            child: TextField(
+                              controller: _passwordController,
+                              obscureText: _obscurePassword,
+                              style: const TextStyle(color: Colors.black),
+                              decoration: InputDecoration(
+                                border: OutlineInputBorder(
+                                  borderSide: const BorderSide(color: Colors.black),
+                                  borderRadius:
+                                      BorderRadius.circular(screenWidth * 0.025),
+                                ),
+                                contentPadding:
+                                    EdgeInsets.symmetric(horizontal: screenWidth * 0.03),
+                                suffixIcon: IconButton(
+                                  icon: Icon(
+                                    _obscurePassword
+                                        ? Icons.visibility_off
+                                        : Icons.visibility,
+                                    color: Colors.grey,
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      _obscurePassword = !_obscurePassword;
+                                    });
+                                  },
+                                ),
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: screenHeight * 0.015),
+                          Divider(color: Colors.grey.withOpacity(0.6), thickness: 1),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              InkWell(
+                                onTap: () => _launchURLPrivacy(context),
+                                child: Text(
+                                  "Privacy Policy",
+                                  style: TextStyle(
+                                    fontSize: screenWidth * 0.03,
+                                    fontWeight: FontWeight.bold,
+                                    color: const Color.fromARGB(132, 0, 0, 0),
+                                  ),
+                                ),
+                              ),
+                              InkWell(
+                                onTap: () => _launchURLForgotPW(context),
+                                child: Text(
+                                  "Forgot Password?",
+                                  style: TextStyle(
+                                    fontSize: screenWidth * 0.03,
+                                    fontWeight: FontWeight.bold,
+                                    color: const Color.fromARGB(132, 0, 0, 0),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: screenHeight * 0.03),
+                          ElevatedButton(
+                            onPressed: _login,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFFeb7f35),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(screenWidth * 0.025),
+                              ),
+                              elevation: 5,
+                              minimumSize: Size(double.infinity, screenHeight * 0.06),
+                            ),
+                            child: Text(
+                              "Login",
+                              style: TextStyle(
+                                fontSize: screenWidth * 0.045,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ],
-      ),
-    );
-  }
+        ),
+      );
+    }
+        ),
+        )
+      ],
+    ),
+  );
+}
+
 }

@@ -11,53 +11,72 @@ class DashboardPage extends StatelessWidget {
 
 @override
 Widget build(BuildContext context) {
+  final double screenWidth = MediaQuery.of(context).size.width;
+  final double screenHeight = MediaQuery.of(context).size.height;
    ModalRoute.of(context)?.addScopedWillPopCallback(() async {
       return await showExitConfirmationDialog(context);
     });
-  final double screenWidth = MediaQuery.of(context).size.width;
-  final double screenHeight = MediaQuery.of(context).size.height;
-
   return Scaffold(
     body: Stack(
       fit: StackFit.expand,
       children: [
+        // Background image
         Image.asset(
           'assets/bgdash.jpg',
           fit: BoxFit.cover,
         ),
+
+        // Gradient overlay
         Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                const Color.fromARGB(255, 0, 0, 0).withOpacity(0.6), 
-                const Color(0xFFeb7f35).withOpacity(0.8), 
+                Colors.black.withOpacity(0.6),
+                const Color(0xFFeb7f35).withOpacity(0.8),
               ],
-              stops: [0.4, 1.0], // 60% Orange, 40% Yellow
+              stops: [0.4, 1.0],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
           ),
         ),
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.06, vertical: screenHeight * 0.04),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              SizedBox(height: screenHeight * 0.02), 
-              _buildLogo(screenWidth),
-              SizedBox(height: screenHeight * 0.07),
-              _buildAboutSection(screenWidth),
-              SizedBox(height: screenHeight * 0.05),
-              _buildButtons(context, screenWidth), // ✅ FIXED: Passing both context and screenWidth
-              Spacer(), // Push footer to bottom
-              _buildFooter(screenWidth),
-            ],
+
+        // Content with responsive padding
+            SafeArea(
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: screenWidth * 0.06,
+                vertical: screenHeight * 0.04,
+              ),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: screenHeight - MediaQuery.of(context).padding.vertical,
+                ),
+                child: IntrinsicHeight(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SizedBox(height: screenHeight * 0.02),
+                      _buildLogo(screenWidth),
+                      SizedBox(height: screenHeight * 0.07),
+                      _buildAboutSection(screenWidth),
+                      SizedBox(height: screenHeight * 0.05),
+                      _buildButtons(context, screenWidth),
+                      Spacer(),
+                      _buildFooter(screenWidth),
+                    ],
+                  ),
+                ),
+              ),
+            ),
           ),
         ),
       ],
     ),
   );
 }
+
 
 
   Widget _buildLogo(double screenWidth) {

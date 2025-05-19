@@ -3,7 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'dart:async';
 import 'package:wvmobile/widgets/skeleton_screen.dart';
-
+import '../helper/exithelper.dart';
 import 'navigation.dart'; 
 import 'profile.dart';
 
@@ -22,6 +22,8 @@ class _HomePageState extends State<HomePage> {
   String userId = "N/A";
   final String baseUrl = "https://myspon.worldvision.org.ph/public/uploads/";
   Timer? _twinkleTimer;
+  bool _assetsLoaded = false;
+
 
 @override
 void initState() {
@@ -29,14 +31,30 @@ void initState() {
   loadUserData();
   startTwinkleEffect();
 
-  Future.delayed(const Duration(seconds: 3), () {
+  // Preload image assets to detect when they're fully loaded
+  _preloadImages().then((_) {
     if (mounted) {
       setState(() {
+        _assetsLoaded = true;
         _isLoading = false;
       });
     }
   });
 }
+
+Future<void> _preloadImages() async {
+  try {
+    await Future.wait([
+      precacheImage(const AssetImage("assets/star2.png"), context),
+      precacheImage(const AssetImage("assets/bgdash.jpg"), context),
+      precacheImage(const AssetImage("assets/community.png"), context),
+      precacheImage(const AssetImage("assets/campaigns.png"), context),
+    ]);
+  } catch (e) {
+    // Optional: handle errors or retry if needed
+  }
+}
+
 
  Future<void> loadUserData() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -102,13 +120,16 @@ void startTwinkleEffect() {
 Widget build(BuildContext context) {
   return Scaffold(
     drawer: const AppDrawer(selectedItem: 'Home'),
-    body: _isLoading
-        ? const SkeletonScreen() 
+    body: (!_assetsLoaded || _isLoading)
+        ? const SkeletonScreen()
         : buildMainContent(context),
   );
 }
 
 Widget buildMainContent(BuildContext context) {
+  ModalRoute.of(context)?.addScopedWillPopCallback(() async {
+  return await showExitConfirmationDialog(context);
+    });
   return Stack(
     children: [
       Positioned.fill(
@@ -163,23 +184,28 @@ Widget buildMainContent(BuildContext context) {
                   child: Container(
                     width: double.infinity,
                     color: Colors.transparent,
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Column(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Row(
+                        children: [
+                          // Greeting text
+                          Expanded(
+                            flex: 6,
+                            child: Column(
                               mainAxisSize: MainAxisSize.min,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  "Hello $userName!",
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 45,
-                                    fontWeight: FontWeight.bold,
+                                FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  alignment: Alignment.centerLeft,
+                                  child: Text(
+                                    "Hello $userName!",
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 45,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
                                   ),
                                 ),
                                 const SizedBox(height: 10),
@@ -191,21 +217,27 @@ Widget buildMainContent(BuildContext context) {
                                     fontWeight: FontWeight.w500,
                                   ),
                                 ),
-                                const SizedBox(height: 5),
                               ],
                             ),
-                            AnimatedOpacity(
+                          ),
+
+                          const SizedBox(width: 10),
+
+                          // Star image
+                          Flexible(
+                            flex: 4,
+                            child: AnimatedOpacity(
                               duration: const Duration(seconds: 1),
                               opacity: starOpacity,
                               child: Image.asset(
                                 "assets/star2.png",
-                                width: 140,
+                                width: MediaQuery.of(context).size.width * 0.25,
                                 height: 100,
                                 fit: BoxFit.contain,
                               ),
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
                   ),

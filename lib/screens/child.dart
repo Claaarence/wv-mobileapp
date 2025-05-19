@@ -170,93 +170,95 @@ class _ChildPageState extends State<ChildPage> {
       return StatefulBuilder(
         builder: (context, setState) {
           return Center(
-            child: Container(
-              width: MediaQuery.of(context).size.width * 0.80,
-              height: MediaQuery.of(context).size.height * 0.65, 
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.95),
-                borderRadius: BorderRadius.circular(24),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.2),
-                    spreadRadius: 5,
-                    blurRadius: 15,
-                    offset: const Offset(0, 3), 
-                  ),
-                ],
-              ),
-              child: Material(
-                color: Colors.transparent,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Align(
-                      alignment: Alignment.topRight,
-                      child: GestureDetector(
-                        onTap: () {
-                          Navigator.of(context).pop(); // Close the modal when tapped
-                        },
-                        child: Icon(
-                          Icons.close,
-                          color: Colors.grey[700],
-                          size: 30,
-                        ),
-                      ),
-                    ),
-                    // Child Image
-                    Center(
-                      child: GestureDetector(
-                        onTap: () {
-                          Navigator.of(context).pop(); // Close the modal when tapped
-                        },
-                        child: CircleAvatar(
-                          radius: 80,
-                          backgroundImage: NetworkImage(child.thumb),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    Center(
-                      child: Text(
-                        "Hi, I'm ${child.givenName}",
-                        style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                     Divider(
-                      color: Colors.grey[300],
-                      thickness: 1,
-                    ),
-                    const SizedBox(height: 30),
-                    Center(
-                      child: Text(
-                        child.text,
-                        style: const TextStyle(fontSize: 16),
-                        textAlign: TextAlign.left,
-                      ),
-                    ),
-                    Divider(
-                      color: Colors.grey[300],
-                      thickness: 1,
-                    ),
-                     const SizedBox(height: 10),
-                   ElevatedButton(
-                      onPressed: () {
-                        // Handle connect button press
-                      },
-                      style: ElevatedButton.styleFrom(
-                        minimumSize: const Size(double.infinity, 50),
-                        backgroundColor: Colors.orange,
-                        foregroundColor: Colors.white, 
-                        textStyle: const TextStyle(fontSize: 15),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      child: const Text('Connect with Me'),
+            child: Material(
+              color: Colors.transparent,
+              child: Container(
+                width: MediaQuery.of(context).size.width * 0.85,
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.95),
+                  borderRadius: BorderRadius.circular(24),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.2),
+                      spreadRadius: 5,
+                      blurRadius: 15,
+                      offset: const Offset(0, 3),
                     ),
                   ],
+                ),
+                child: SafeArea(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Align(
+                          alignment: Alignment.topRight,
+                          child: GestureDetector(
+                            onTap: () => Navigator.of(context).pop(),
+                            child: MouseRegion(
+                              cursor: SystemMouseCursors.click,
+                              child: Icon(
+                                Icons.close,
+                                color: Colors.orange,
+                                size: 30,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Center(
+                          child: CircleAvatar(
+                            radius: 70,
+                            backgroundImage: NetworkImage(child.thumb),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        Center(
+                          child: Text(
+                            "Hi, I'm ${child.givenName}",
+                            style: const TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.orange,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        Divider(color: Colors.orange.withOpacity(0.3), thickness: 1.2),
+                        const SizedBox(height: 20),
+                        Text(
+                          child.text,
+                          style: const TextStyle(fontSize: 16),
+                          textAlign: TextAlign.left,
+                        ),
+                        const SizedBox(height: 20),
+                        Divider(color: Colors.orange.withOpacity(0.3), thickness: 1.2),
+                        const SizedBox(height: 20),
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              // Handle connect button press
+                            },
+                            style: ElevatedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(vertical: 14),
+                              backgroundColor: Colors.orange,
+                              foregroundColor: Colors.white,
+                              textStyle: const TextStyle(fontSize: 16),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              elevation: 4,
+                              shadowColor: Colors.orangeAccent,
+                            ),
+                            child: const Text('Connect with Me'),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -275,6 +277,7 @@ class _ChildPageState extends State<ChildPage> {
     },
   );
 }
+
 
 
   @override
