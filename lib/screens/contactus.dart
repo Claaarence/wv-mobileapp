@@ -2,18 +2,108 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart'; // For social media icons
 import 'navigation.dart';
 import '../helper/exithelper.dart';
-class ContactUsPage extends StatelessWidget {
+import 'package:fluttertoast/fluttertoast.dart';
+import '../services/contactus/auth_service.dart';
+
+class ContactUsPage extends StatefulWidget {
   const ContactUsPage({super.key});
+
+  @override
+  State<ContactUsPage> createState() => _ContactUsPageState();
+}
+
+class _ContactUsPageState extends State<ContactUsPage> {
+  final TextEditingController messageController = TextEditingController();
+  bool isSubmitting = false;
+  String? feedbackError;
+Future<void> _submitFeedback() async {
+  setState(() {
+    feedbackError = null;
+    isSubmitting = true;
+  });
+
+  final feedback = messageController.text.trim();
+
+  if (feedback.isEmpty) {
+    setState(() {
+      feedbackError = 'Feedback is required';
+      isSubmitting = false;
+    });
+    return;
+  }
+
+  try {
+    // DEBUG: Print feedback to terminal
+    print("Submitting feedback: $feedback");
+
+    final response = await ContactUsAuthService.sendFeedback(feedback);
+
+    if (response['success'] == true) {
+      messageController.clear();
+
+      // Show animated modal
+      showGeneralDialog(
+        context: context,
+        barrierDismissible: false,
+        barrierLabel: "Feedback Sent",
+        transitionDuration: const Duration(milliseconds: 400),
+        pageBuilder: (_, __, ___) => const SizedBox.shrink(), // Required placeholder
+        transitionBuilder: (_, anim, __, ___) {
+          return ScaleTransition(
+            scale: CurvedAnimation(parent: anim, curve: Curves.easeOutBack),
+            child: AlertDialog(
+              backgroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              contentPadding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: const [
+                  Icon(Icons.check_circle, color: Colors.orange, size: 50),
+                  SizedBox(height: 16),
+                  Text(
+                    "Your feedback has been sent!",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      );
+
+      await Future.delayed(const Duration(seconds: 2));
+      if (context.mounted) Navigator.of(context).pop(); // Dismiss modal
+    } else {
+      setState(() {
+        feedbackError = response['error'] ?? 'Something went wrong.';
+      });
+    }
+  } catch (e) {
+    setState(() {
+      feedbackError = "Failed to send feedback: $e";
+    });
+  } finally {
+    setState(() {
+      isSubmitting = false;
+    });
+  }
+}
+
+
 
   @override
   Widget build(BuildContext context) {
     final bottomPadding = MediaQuery.of(context).padding.bottom;
-    final TextEditingController messageController = TextEditingController();
-    
 
     ModalRoute.of(context)?.addScopedWillPopCallback(() async {
       return await showExitConfirmationDialog(context);
     });
+    
  return Scaffold(
     backgroundColor: const Color(0xFFeb7f35),
     drawer: const AppDrawer(selectedItem: 'Contact Us'),
@@ -76,6 +166,13 @@ class ContactUsPage extends StatelessWidget {
             decoration: const BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+               boxShadow: [
+                        BoxShadow(
+                          color: Colors.black26,
+                          blurRadius: 8,
+                          offset: Offset(0, -3),
+                        ),
+                      ],
             ),
             child: LayoutBuilder(
               builder: (context, constraints) {
@@ -251,25 +348,39 @@ class ContactUsPage extends StatelessWidget {
                                   const SizedBox(height: 10),
                                   const Divider(thickness: 1, color: Color(0xFFeb7f35)),
                                   const SizedBox(height: 10),
-                                  Center(
-                                    child: ElevatedButton.icon(
-                                      onPressed: () {
-                                        // Handle send logic
-                                      },
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.orange,
-                                        padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(16),
+                                      Center(
+                                        child: Column(
+                                          children: [
+                                            ElevatedButton.icon(
+                                              onPressed: isSubmitting ? null : _submitFeedback,
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor: Colors.orange,
+                                                padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius: BorderRadius.circular(16),
+                                                ),
+                                              ),
+                                              icon: const Icon(Icons.send, color: Colors.white),
+                                              label: isSubmitting
+                                                  ? const SizedBox(
+                                                      width: 20,
+                                                      height: 20,
+                                                      child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                                                    )
+                                                  : const Text("Send Message", style: TextStyle(fontSize: 18, color: Colors.white)),
+                                            ),
+                                            if (feedbackError != null)
+                                              Padding(
+                                                padding: const EdgeInsets.only(top: 8.0),
+                                                child: Text(
+                                                  feedbackError!,
+                                                  style: const TextStyle(color: Colors.red),
+                                                  textAlign: TextAlign.center,
+                                                ),
+                                              ),
+                                          ],
                                         ),
                                       ),
-                                      icon: const Icon(Icons.send, color: Colors.white),
-                                      label: const Text(
-                                        "Send Message",
-                                        style: TextStyle(fontSize: 18, color: Colors.white),
-                                      ),
-                                    ),
-                                  ),
                                   const SizedBox(height: 30),
                                 ],
                               ),

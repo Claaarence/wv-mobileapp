@@ -5,6 +5,8 @@ import '../services/devotion/auth_service.dart';
 import '../models/devotion.dart';
 import '../helper/exithelper.dart';
 
+
+
 class DevotionPage extends StatefulWidget {
   const DevotionPage({super.key});
 
@@ -155,7 +157,14 @@ class _DevotionPageState extends State<DevotionPage> {
             const SizedBox(height: 10),
             Expanded(
               child: Container(
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
+                    boxShadow: [
+                        BoxShadow(
+                        color: Colors.black.withOpacity(0.4),
+                        blurRadius: 10,
+                        offset: const Offset(0, -3),
+                        ),
+                      ],
                   color: Colors.white,
                   borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
                 ),

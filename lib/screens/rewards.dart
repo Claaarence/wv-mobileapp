@@ -224,6 +224,13 @@ Future<void> _fetchRewards() async {
               decoration: const BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+                           boxShadow: [
+                        BoxShadow(
+                          color: Colors.black26,
+                          blurRadius: 8,
+                          offset: Offset(0, -3),
+                        ),
+                      ],
                         ),
               child: ListView.builder(
                 controller: _scrollController,

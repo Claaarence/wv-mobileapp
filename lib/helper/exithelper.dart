@@ -4,10 +4,8 @@ import 'package:flutter/services.dart';
 
 void handleExitApp() {
   if (Platform.isAndroid) {
-    SystemNavigator.pop(); // Proper Android exit
+    SystemNavigator.pop(); 
   } else if (Platform.isIOS) {
-    // Optionally show message or do nothing
-    // iOS discourages force exit
   }
 }
 

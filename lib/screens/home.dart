@@ -140,45 +140,48 @@ Widget buildMainContent(BuildContext context) {
           Positioned.fill(
             child: Column(
               children: [
-                SafeArea(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Builder(
-                          builder: (context) => IconButton(
-                            icon: const Icon(Icons.menu, color: Colors.white),
-                            onPressed: () => Scaffold.of(context).openDrawer(),
-                          ),
+             SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 0),
+                  child: Row(
+                    children: [
+                      // Left: Menu icon
+                      Builder(
+                        builder: (context) => IconButton(
+                          icon: const Icon(Icons.menu, color: Colors.white),
+                          onPressed: () => Scaffold.of(context).openDrawer(),
                         ),
-                       Row(
-                        children: [
-                          const SizedBox(width: 10),
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (context) => const ProfilePage()),
-                              );
-                            },
-                            child: CircleAvatar(
-                              radius: 20,
-                              backgroundColor: Colors.white,
-                              backgroundImage: avatarUrl.isNotEmpty 
-                                  ? NetworkImage(avatarUrl) 
-                                  : null,
-                              child: avatarUrl.isEmpty
-                                  ? const Icon(Icons.person, color: Colors.grey, size: 30)
-                                  : null,
-                            ),
-                          ),
-                        ],
                       ),
-                      ],
-                    ),
+                      const Spacer(),
+                      Image.asset(
+                        'assets/wv2.png',
+           
+                        height: 25,
+                      ),
+                      const Spacer(),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const ProfilePage()),
+                          );
+                        },
+                        child: CircleAvatar(
+                          radius: 20,
+                          backgroundColor: Colors.white,
+                          backgroundImage: avatarUrl.isNotEmpty 
+                              ? NetworkImage(avatarUrl) 
+                              : null,
+                          child: avatarUrl.isEmpty
+                              ? const Icon(Icons.person, color: Colors.grey, size: 30)
+                              : null,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
+              ),
+
                 Expanded(
                   flex: 2,
                   child: Container(
@@ -251,7 +254,15 @@ Widget buildMainContent(BuildContext context) {
                           decoration: const BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black26,
+                          blurRadius: 8,
+                          offset: Offset(0, -3),
+                        ),
+                      ],
                           ),
+                          
                         ),
                       ),
                       Padding(

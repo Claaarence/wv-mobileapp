@@ -115,9 +115,16 @@ class _AppDrawerState extends State<AppDrawer> {
   Widget _buildHeader(double screenWidth) {
     return Container(
       padding: const EdgeInsets.only(top: 50, left: 20, right: 20, bottom: 20),
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.only(bottomRight: Radius.circular(80)),
+         boxShadow: [
+                        BoxShadow(
+                        color: Colors.black.withOpacity(0.4),
+                        blurRadius: 10,
+                        offset: const Offset(0, 5),
+                        ),
+                      ],
       ),
       child: Column(
         children: [
@@ -234,14 +241,22 @@ class _AppDrawerState extends State<AppDrawer> {
           'Sign Out',
           style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
         ),
-        onTap: () {
-          Navigator.pop(context);
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const LoginPage()),
-          );
+        onTap: () async {
+             await logout(context);
         },
       ),
     );
   }
+}
+
+Future<void> logout(BuildContext context) async {
+ final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('token');
+    await prefs.setBool('isNewUser', false); 
+
+  Navigator.pushNamedAndRemoveUntil(
+    context,
+    '/login',
+    (Route<dynamic> route) => false,
+  );
 }

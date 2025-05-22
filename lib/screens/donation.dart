@@ -118,7 +118,17 @@ Widget build(BuildContext context) {
 ),
 Expanded(
   child: Container(
-    color: Colors.white,
+    decoration: const BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+                           boxShadow: [
+                        BoxShadow(
+                          color: Colors.black26,
+                          blurRadius: 8,
+                          offset: Offset(0, -3),
+                        ),
+                      ],
+                        ),
     padding: EdgeInsets.zero, // Removes any unexpected space
     child: FutureBuilder<List<Map<String, dynamic>>?>(
       future: donationData,
@@ -274,7 +284,7 @@ Widget _buildDonationItem(Map<String, dynamic> donation) {
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.08),
+              color: Colors.black.withOpacity(0.4),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -337,7 +347,7 @@ Widget _buildDonationItem(Map<String, dynamic> donation) {
                   const SizedBox(height: 12),
                   Row(
                     children: [
-                      const Icon(Icons.attach_money, color: Color(0xFFeb7f35)),
+                      const Icon(Icons.payments, color: Color(0xFFeb7f35)),
                       const SizedBox(width: 8),
                       RichText(
                         text: TextSpan(
@@ -345,7 +355,7 @@ Widget _buildDonationItem(Map<String, dynamic> donation) {
                           style: const TextStyle(color: Colors.black),
                           children: [
                             TextSpan(
-                              text: "\$ $amount",
+                              text: "\₱ $amount",
                               style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                                 color: Colors.black,
@@ -359,7 +369,7 @@ Widget _buildDonationItem(Map<String, dynamic> donation) {
                   const SizedBox(height: 8),
                   Row(
                     children: [
-                      const Icon(Icons.payment, color: Color(0xFFeb7f35)),
+                      const Icon(Icons.credit_card, color: Color(0xFFeb7f35)),
                       const SizedBox(width: 8),
                       RichText(
                         text: TextSpan(

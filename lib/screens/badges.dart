@@ -208,7 +208,13 @@ class _BadgesPageState extends State<BadgesPage> {
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(20),
-                        boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 10, offset: Offset(3, 3))],
+                           boxShadow: [
+                        BoxShadow(
+                          color: Colors.black26,
+                          blurRadius: 8,
+                          offset: Offset(0, -3),
+                        ),
+                           ],
                       ),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,

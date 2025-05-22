@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart'; // Add this import
 import 'package:wvmobile/screens/contactus.dart';
 import 'package:wvmobile/screens/dashboard.dart';
 import 'package:wvmobile/screens/login.dart';
@@ -8,19 +9,26 @@ import 'package:wvmobile/screens/child.dart';
 import 'package:wvmobile/screens/donation.dart';
 import 'package:wvmobile/screens/rewards.dart';
 import 'package:wvmobile/screens/badges.dart';
-import 'package:wvmobile/screens/splashscreen.dart';
 import 'package:wvmobile/screens/devotion.dart';
 import 'package:wvmobile/screens/homescreen/campaigns.dart';
 import 'package:wvmobile/screens/homescreen/childupdates.dart';
 import 'package:wvmobile/screens/homescreen/community.dart';
+import 'package:wvmobile/screens/splashscreen.dart';
 
 
-void main() {
-  runApp(const MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized(); // Required for async in main
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+  final String? token = prefs.getString('token');
+
+  runApp(MyApp(initialRoute: token != null ? '/home' : '/login'));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final String initialRoute;
+
+  const MyApp({super.key, required this.initialRoute});
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +51,7 @@ class MyApp extends StatelessWidget {
          '/contactus': (context) => ContactUsPage(),
          '/devotion': (context) => DevotionPage(),
          '/campaigns': (context) => CampaignsPage(),
-         '/childupdates': (context) => ChildupdatesPage(),
+         '/childupdates': (context) => ChildUpdatesPage(),
          '/community': (context) => CommunityPage(),
 
       },
