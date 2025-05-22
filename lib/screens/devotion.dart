@@ -168,9 +168,17 @@ class _DevotionPageState extends State<DevotionPage> {
                   color: Colors.white,
                   borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
                 ),
-                child: isLoading && displayedDevotions.isEmpty
+               child: isLoading && displayedDevotions.isEmpty
                     ? const Center(child: CircularProgressIndicator(color: Color(0xFFeb7f35)))
-                    : NotificationListener<ScrollNotification>(
+                    : !isLoading && displayedDevotions.isEmpty
+                        ? const Center(
+                            child: Text(
+                              "There are currently no devotion listed,\nPlease come back later.",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(fontSize: 16, color: Colors.black54),
+                            ),
+                          )
+                        : NotificationListener<ScrollNotification>(
                         onNotification: (ScrollNotification scrollInfo) {
                           if (!isLoading &&
                               scrollInfo.metrics.pixels == scrollInfo.metrics.maxScrollExtent) {

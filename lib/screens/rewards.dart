@@ -3,6 +3,7 @@ import '../services/rewards/auth_service.dart'; // Make sure this path matches y
 import 'navigation.dart';
 import 'package:shimmer/shimmer.dart';
 import '../helper/exithelper.dart';
+import '../screens/orderspage.dart';
 
 
 class RewardsPage extends StatefulWidget {
@@ -69,7 +70,177 @@ Future<void> _fetchRewards() async {
   setState(() => isLoading = false);
 }
 
- void _showRewardModal(BuildContext context, String title, String imageUrl, String description) {
+void _showRewardModal(
+  BuildContext context,
+  String title,
+  String imageUrl,
+  String description,
+  int qty, 
+  int id,
+) {
+  qty = 1; // <---------- comment this line to use the actual qty
+  final isOutOfStock = qty == 0;
+
+  void _showSuccessOrErrorDialog(bool success) {
+    showGeneralDialog(
+      context: context,
+      barrierDismissible: false,
+      barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
+      transitionDuration: const Duration(milliseconds: 300),
+      pageBuilder: (context, animation, secondaryAnimation) {
+        return Center(
+          child: Material(
+            color: Colors.transparent,
+            child: Container(
+              width: MediaQuery.of(context).size.width * 0.6,
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: success ? Colors.green[300] : Colors.red[300],
+                borderRadius: BorderRadius.circular(15),
+              ),
+              child: Text(
+                success ? "Redeemed successfully!" : "Redemption failed.",
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ),
+        );
+      },
+    );
+
+    // Auto dismiss after 2 seconds
+    Future.delayed(const Duration(seconds: 2), () {
+      Navigator.of(context).pop(); // dismiss success/error dialog
+    });
+  }
+
+  void _showConfirmationDialog() {
+
+
+    showGeneralDialog(
+      context: context,
+      barrierDismissible: true,
+      barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
+      transitionDuration: const Duration(milliseconds: 300),
+      pageBuilder: (context, animation, secondaryAnimation) {
+        return Center(
+          child: Material(
+            color: Colors.transparent,
+            child: Container(
+              width: MediaQuery.of(context).size.width * 0.8,
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: const Color(0xFFeb7f35), width: 1.5),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFFeb7f35).withOpacity(0.3),
+                    blurRadius: 10,
+                    offset: const Offset(0, 6),
+                  ),
+                ],
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text(
+                    "Confirm Redemption",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20,
+                      color: Color(0xFFeb7f35),
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 16),
+                 Text(
+                    "Please be advised that the items are for pick-up at the World Vision Development Foundation located in 389 Quezon Ave., cor. West 6th st., West Triangle, QC. \n\nIf you wish to have the item/s delivered kindly let us know so we could make special arrangement.",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12,
+                      color: Color.fromARGB(255, 65, 65, 65),
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 24),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                   OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(color: Colors.red),
+                        foregroundColor: Colors.red, // text color
+                        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      onPressed: () {
+                        Navigator.of(context).pop(); // dismiss confirmation
+                      },
+                      child: const Text(
+                        "Cancel",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFFeb7f35),
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 12, horizontal: 24),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        onPressed: () async {
+                          Navigator.of(context).pop(); // dismiss confirmation
+                          final authService = AuthService();
+                          final result = await authService.redeemReward(
+                            itemId: id.toString(),
+                            qtyOrdered: 1,
+                          );
+
+                          if (result != null && result['status'] == 200) { // or check the key your API uses
+                            _showSuccessOrErrorDialog(true);
+                          } else {
+                            _showSuccessOrErrorDialog(false);
+                          }
+                        },
+                        child: const Text(
+                          "Proceed",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+      transitionBuilder: (context, animation, secondaryAnimation, child) {
+        return ScaleTransition(
+          scale: CurvedAnimation(parent: animation, curve: Curves.easeOutBack),
+          child: child,
+        );
+      },
+    );
+  }
+
   showGeneralDialog(
     context: context,
     barrierDismissible: true,
@@ -122,22 +293,26 @@ Future<void> _fetchRewards() async {
                   width: double.infinity,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFeb7f35),
+                      backgroundColor: isOutOfStock
+                          ? Colors.grey
+                          : const Color(0xFFeb7f35),
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
                     ),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                      // Handle redeem logic
-                    },
-                    child: const Text(
-                      "Redeem",
-                      style: TextStyle(
+                    onPressed: isOutOfStock
+                        ? null
+                        : () {
+                            // Instead of redeem directly, show confirmation dialog
+                            _showConfirmationDialog();
+                          },
+                    child: Text(
+                      isOutOfStock ? "Temporarily Out of Stock" : "Redeem",
+                      style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
-                        color: Colors.white, // <-- White text
+                        color: Colors.white,
                       ),
                     ),
                   ),
@@ -156,7 +331,6 @@ Future<void> _fetchRewards() async {
     },
   );
 }
-
 
   @override
   Widget build(BuildContext context) {
@@ -192,8 +366,14 @@ Future<void> _fetchRewards() async {
                   ),
                   IconButton(
                     icon: const Icon(Icons.shopping_cart, color: Colors.white),
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const OrdersPage()),
+                      );
+                    },
                   ),
+
                 ],
               ),
             ),
@@ -243,7 +423,7 @@ Future<void> _fetchRewards() async {
                       final description = _stripHtmlTags(reward['item_description'] ?? "");
 
                   return GestureDetector(
-                    onTap: () => _showRewardModal(context, reward['item_name'], fullImageUrl, description),
+                    onTap: () => _showRewardModal(context, reward['item_name'], fullImageUrl, description, reward['qty'], reward['id']),
                     child: Container(
                       margin: const EdgeInsets.only(bottom: 16),
                       decoration: BoxDecoration(

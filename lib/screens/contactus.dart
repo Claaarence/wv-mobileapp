@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart'; // For social media icons
 import 'navigation.dart';
 import '../helper/exithelper.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import '../services/contactus/auth_service.dart';
 
 class ContactUsPage extends StatefulWidget {

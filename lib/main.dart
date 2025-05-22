@@ -4,6 +4,7 @@ import 'package:wvmobile/screens/contactus.dart';
 import 'package:wvmobile/screens/dashboard.dart';
 import 'package:wvmobile/screens/login.dart';
 import 'package:wvmobile/screens/home.dart';
+import 'package:wvmobile/screens/orderspage.dart';
 import 'package:wvmobile/screens/profile.dart';
 import 'package:wvmobile/screens/child.dart';
 import 'package:wvmobile/screens/donation.dart';
@@ -53,6 +54,7 @@ class MyApp extends StatelessWidget {
          '/campaigns': (context) => CampaignsPage(),
          '/childupdates': (context) => ChildUpdatesPage(),
          '/community': (context) => CommunityPage(),
+         '/orders': (context) => OrdersPage(),
 
       },
     );
