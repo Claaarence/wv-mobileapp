@@ -4,6 +4,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:async';
 import '../services/partnerInfo/auth_service.dart';
 import '../helper/exithelper.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -66,6 +68,99 @@ class _ProfilePageState extends State<ProfilePage> {
       debugPrint("Error loading profile or avatar: $e");
     }
   }
+
+Future<void> _pickAndUploadImage(ImageSource source) async {
+  final picker = ImagePicker();
+  final pickedFile = await picker.pickImage(source: source);
+
+  if (pickedFile != null) {
+    final imageFile = File(pickedFile.path);
+    final success = await AuthService().uploadAvatar(imageFile);
+
+    _showSuccessOrErrorDialog(context, success);
+
+    // Reload profile/avatar if needed here
+  }
+}
+
+void _showSuccessOrErrorDialog(BuildContext context, bool success) {
+  showGeneralDialog(
+    context: context,
+    barrierDismissible: false,
+    barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
+    transitionDuration: const Duration(milliseconds: 300),
+    pageBuilder: (context, animation, secondaryAnimation) {
+      return Center(
+        child: Material(
+          color: Colors.transparent,
+          child: Container(
+            width: MediaQuery.of(context).size.width * 0.6,
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: success ? Colors.green[300] : Colors.red[300],
+              borderRadius: BorderRadius.circular(15),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  success ? Icons.check_circle : Icons.error,
+                  size: 48,
+                  color: Colors.white,
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  success ? "Avatar updated successfully!" : "Failed to update avatar.",
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    },
+  );
+
+  // Auto dismiss after 2 seconds
+  Future.delayed(const Duration(seconds: 2), () {
+    Navigator.of(context).pop();
+  });
+}
+void _showImageSourceActionSheet(BuildContext context) {
+  showModalBottomSheet(
+    context: context,
+    builder: (BuildContext bc) {
+      return SafeArea(
+        child: Wrap(
+          children: <Widget>[
+            ListTile(
+              leading: const Icon(Icons.photo_camera),
+              title: const Text('Take a photo'),
+              onTap: () {
+                Navigator.of(context).pop();
+                _pickAndUploadImage(ImageSource.camera);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_library),
+              title: const Text('Choose from gallery'),
+              onTap: () {
+                Navigator.of(context).pop();
+                _pickAndUploadImage(ImageSource.gallery);
+              },
+            ),
+          ],
+        ),
+      );
+    },
+  );
+}
+
 
 void _showEditModal() {
   void _showSuccessPopup() {
@@ -348,7 +443,7 @@ void _showEditModal() {
                             right: 5,
                             child: GestureDetector(
                               onTap: () {
-                                _showEditModal();
+                               _showImageSourceActionSheet(context);
                               },
                               child: Container(
                                 decoration: BoxDecoration(
