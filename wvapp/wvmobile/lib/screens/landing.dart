@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'dashboard.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../helper/exithelper.dart';
 
 class LandingPage extends StatefulWidget {
   const LandingPage({super.key});
@@ -17,6 +18,9 @@ class _LandingPageState extends State<LandingPage> {
 
   @override
   Widget build(BuildContext context) {
+     ModalRoute.of(context)?.addScopedWillPopCallback(() async {
+      return await showExitConfirmationDialog(context);
+    });
     return Scaffold(
       body: Stack(
         children: [

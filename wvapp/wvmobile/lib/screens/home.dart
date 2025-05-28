@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'dart:async';
-
+import 'package:wvmobile/widgets/skeleton_screen.dart';
+import '../helper/exithelper.dart';
 import 'navigation.dart'; 
 import 'profile.dart';
 
@@ -14,18 +15,46 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  bool _isLoading = true;
   String userName = "Guest";
   double starOpacity = 1.0;
   String avatarUrl = "N/A";
   String userId = "N/A";
   final String baseUrl = "https://myspon.worldvision.org.ph/public/uploads/";
+  Timer? _twinkleTimer;
+  bool _assetsLoaded = false;
 
-  @override
-  void initState() {
-    super.initState();
-    loadUserData();
-    startTwinkleEffect();
+
+@override
+void initState() {
+  super.initState();
+  loadUserData();
+  startTwinkleEffect();
+
+  // Preload image assets to detect when they're fully loaded
+  _preloadImages().then((_) {
+    if (mounted) {
+      setState(() {
+        _assetsLoaded = true;
+        _isLoading = false;
+      });
+    }
+  });
+}
+
+Future<void> _preloadImages() async {
+  try {
+    await Future.wait([
+      precacheImage(const AssetImage("assets/star2.png"), context),
+      precacheImage(const AssetImage("assets/bgdash.jpg"), context),
+      precacheImage(const AssetImage("assets/community.png"), context),
+      precacheImage(const AssetImage("assets/campaigns.png"), context),
+    ]);
+  } catch (e) {
+    // Optional: handle errors or retry if needed
   }
+}
+
 
  Future<void> loadUserData() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -69,92 +98,159 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  void startTwinkleEffect() {
-    Timer.periodic(const Duration(seconds: 1), (timer) {
+void startTwinkleEffect() {
+  _twinkleTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+    if (mounted) {
       setState(() {
         starOpacity = starOpacity == 1.0 ? 0.1 : 1.0;
       });
-    });
+    }
+  });
+}
+
+
+ @override
+  void dispose() {
+    _twinkleTimer?.cancel(); 
+    super.dispose();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      drawer: const AppDrawer(selectedItem: 'Home'),
-      body: Stack(
+
+@override
+Widget build(BuildContext context) {
+  return Scaffold(
+    drawer: const AppDrawer(selectedItem: 'Home'),
+    body: (!_assetsLoaded || _isLoading)
+        ? const SkeletonScreen()
+        : buildMainContent(context),
+  );
+}
+
+Widget buildMainContent(BuildContext context) {
+  ModalRoute.of(context)?.addScopedWillPopCallback(() async {
+  return await showExitConfirmationDialog(context);
+    });
+  return Stack(
+    children: [
+      Positioned.fill(
+       child: Column(
+  children: [
+    // Top 20% image with gradient overlay
+    Expanded(
+      flex: 5, // 20%
+      child: Stack(
         children: [
           Positioned.fill(
-            child: Container(
-              color: const Color(0xFFeb7f35),
+            child: Image.asset(
+              'assets/hp.jpg', // Replace with your image
+              fit: BoxFit.cover,
             ),
           ),
           Positioned.fill(
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.black.withOpacity(0.5),
+                    const Color.fromARGB(255, 255, 102, 0).withOpacity(0.47),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    ),
+
+    // Remaining 80% empty or with other content
+    Expanded(
+      flex: 8,
+      child: Container(
+        color: Colors.white, // Change this if needed
+      ),
+    ),
+  ],
+),
+      ),
+          Positioned.fill(
             child: Column(
               children: [
-                SafeArea(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Builder(
-                          builder: (context) => IconButton(
-                            icon: const Icon(Icons.menu, color: Colors.white),
-                            onPressed: () => Scaffold.of(context).openDrawer(),
-                          ),
+             SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 0),
+                  child: Row(
+                    children: [
+                      // Left: Menu icon
+                      Builder(
+                        builder: (context) => IconButton(
+                          icon: const Icon(Icons.menu, color: Colors.white),
+                          onPressed: () => Scaffold.of(context).openDrawer(),
                         ),
-                       Row(
-                        children: [
-                          const SizedBox(width: 10),
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (context) => const ProfilePage()),
-                              );
-                            },
-                            child: CircleAvatar(
-                              radius: 20,
-                              backgroundColor: Colors.white,
-                              backgroundImage: avatarUrl.isNotEmpty 
-                                  ? NetworkImage(avatarUrl) 
-                                  : null,
-                              child: avatarUrl.isEmpty
-                                  ? const Icon(Icons.person, color: Colors.grey, size: 30)
-                                  : null,
-                            ),
-                          ),
-                        ],
                       ),
-                      ],
-                    ),
+                      const Spacer(),
+                      Image.asset(
+                        'assets/wv2.png',
+           
+                        height: 25,
+                      ),
+                      const Spacer(),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const ProfilePage()),
+                          );
+                        },
+                        child: CircleAvatar(
+                          radius: 20,
+                          backgroundColor: Colors.white,
+                          backgroundImage: avatarUrl.isNotEmpty 
+                              ? NetworkImage(avatarUrl) 
+                              : null,
+                          child: avatarUrl.isEmpty
+                              ? const Icon(Icons.person, color: Colors.grey, size: 30)
+                              : null,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
+              ),
+
                 Expanded(
                   flex: 2,
                   child: Container(
                     width: double.infinity,
                     color: Colors.transparent,
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Column(
-                              mainAxisSize: MainAxisSize.min,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  "Hello $userName!",
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 45,
-                                    fontWeight: FontWeight.bold,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Row(
+                        children: [
+                          // Greeting text
+                          Expanded(
+                            flex: 6,
+                           child: Padding(
+                              padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  alignment: Alignment.centerLeft,
+                                  child: Text(
+                                    "Hello $userName!",
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 45,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
                                   ),
                                 ),
-                                const SizedBox(height: 10),
+              
                                 const Text(
                                   "Glad to have you here!",
                                   style: TextStyle(
@@ -163,27 +259,50 @@ class _HomePageState extends State<HomePage> {
                                     fontWeight: FontWeight.w500,
                                   ),
                                 ),
-                                const SizedBox(height: 5),
+                                   const SizedBox(height: 20),
+                               Padding(
+                                  padding: EdgeInsets.only(
+                                    right: 8,
+                                    top: MediaQuery.of(context).size.height * 0.005,
+                                    bottom: MediaQuery.of(context).size.height * 0.015,
+                                  ),
+                                  child: const Text(
+                                    "Our vision for every child, life in all its fullness. Our prayer for every heart, the will to make it so.",
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 9, // slightly bigger for better readability
+                                      fontWeight: FontWeight.w400,
+                                    ),
+                                  ),
+                                ),
+                              const SizedBox(height: 20),
                               ],
                             ),
-                            AnimatedOpacity(
-                              duration: const Duration(seconds: 1),
-                              opacity: starOpacity,
-                              child: Image.asset(
-                                "assets/star2.png",
-                                width: 140,
-                                height: 100,
-                                fit: BoxFit.contain,
+                          ),
+                          ),
+
+                          const SizedBox(width: 10),
+
+                          // Star image
+                          Flexible(
+                            flex: 4,
+                            child:Opacity(
+                                opacity: 1, // Use 1.0 for fully visible or any value between 0–1
+                                child: Image.asset(
+                                  "assets/wvlogowhite.png",
+                                  width: MediaQuery.of(context).size.width * 0.50,
+                                  height: 100,
+                                  fit: BoxFit.contain,
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
                 ),
                 Expanded(
-                  flex: 8,
+                  flex: 7,
                   child: Stack(
                     children: [
                       Positioned.fill(
@@ -191,7 +310,15 @@ class _HomePageState extends State<HomePage> {
                           decoration: const BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black26,
+                          blurRadius: 8,
+                          offset: Offset(0, -3),
+                        ),
+                      ],
                           ),
+                          
                         ),
                       ),
                       Padding(
@@ -215,10 +342,8 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
         ],
-      ),
-    );
+      );
   }
-
 Widget buildCard(String title, String imagePath) {
   return GestureDetector(
     onTap: () {

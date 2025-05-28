@@ -1,6 +1,5 @@
-// ignore_for_file: unnecessary_import, deprecated_member_use
-
 import 'package:flutter/material.dart';
+import 'package:wvmobile/screens/home.dart';
 import 'dart:async';
 import 'dashboard.dart';
 import 'landing.dart';
@@ -21,35 +20,42 @@ class SplashScreenState extends State<SplashScreen>
   @override
   void initState() {
     super.initState();
+
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 1),
     )..repeat(reverse: true);
 
-    _glowAnimation = Tween<double>(begin: 0.4, end: 0.8).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
-    );
+    _glowAnimation = Tween<double>(begin: 0.3, end: 1.0)
+        .animate(_animationController);
 
-    _checkUserStatus();
+    _handleSplashNavigation();
   }
 
-    // Async function to check user status
-  Future<void> _checkUserStatus() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    bool? isNewUser = prefs.getBool('isNewUser');
+  Future<void> _handleSplashNavigation() async {
+    await Future.delayed(const Duration(seconds: 4));
 
-    await Future.delayed(const Duration(seconds: 8)); // Splash screen duration
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final String? token = prefs.getString('token');
+    final bool? isNewUser = prefs.getBool('isNewUser');
 
-    if (mounted) {
-      if (isNewUser == null || isNewUser == true) {
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => const LandingPage()),
-        );
-      } else {
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => const DashboardPage()),
-        );
-      }
+    if (!mounted) return;
+
+    if (token != null && token.isNotEmpty) {
+      // Logged in
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => const HomePage()),
+      );
+    } else if (isNewUser == null || isNewUser == true) {
+      // New user
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => const LandingPage()),
+      );
+    } else {
+      // Returning user, not logged in
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => const DashboardPage()),
+      );
     }
   }
 
@@ -64,7 +70,7 @@ class SplashScreenState extends State<SplashScreen>
     final Size screenSize = MediaQuery.of(context).size;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFFF6600), // Orange background
+      backgroundColor: const Color(0xFFFF6600),
       body: Stack(
         children: [
           Center(
@@ -72,7 +78,8 @@ class SplashScreenState extends State<SplashScreen>
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.05),
+                  padding:
+                      EdgeInsets.symmetric(horizontal: screenSize.width * 0.05),
                   child: Image.asset(
                     'assets/wvlogowhite.png',
                     width: screenSize.width * 0.6,
@@ -80,7 +87,8 @@ class SplashScreenState extends State<SplashScreen>
                 ),
                 SizedBox(height: screenSize.height * 0.1),
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.05),
+                  padding:
+                      EdgeInsets.symmetric(horizontal: screenSize.width * 0.05),
                   child: Image.asset(
                     'assets/wv2.png',
                     width: screenSize.width * 0.4,
@@ -89,7 +97,6 @@ class SplashScreenState extends State<SplashScreen>
               ],
             ),
           ),
-
           Positioned(
             top: screenSize.height * 0.52,
             right: screenSize.width * 0.15,
@@ -125,7 +132,6 @@ class SplashScreenState extends State<SplashScreen>
               },
             ),
           ),
-
           Positioned(
             bottom: screenSize.height * 0.05,
             left: 0,

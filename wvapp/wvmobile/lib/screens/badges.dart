@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'navigation.dart';
 import '../services/badges/auth_service.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import '../helper/exithelper.dart';
 
 class BadgesPage extends StatefulWidget {
   const BadgesPage({super.key});
@@ -132,6 +133,9 @@ class _BadgesPageState extends State<BadgesPage> {
 
   @override
   Widget build(BuildContext context) {
+     ModalRoute.of(context)?.addScopedWillPopCallback(() async {
+      return await showExitConfirmationDialog(context);
+    });
     return Scaffold(
       backgroundColor: const Color(0xFFeb7f35),
       drawer: const AppDrawer(selectedItem: 'Badges'),
@@ -204,7 +208,13 @@ class _BadgesPageState extends State<BadgesPage> {
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(20),
-                        boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 10, offset: Offset(3, 3))],
+                           boxShadow: [
+                        BoxShadow(
+                          color: Colors.black26,
+                          blurRadius: 8,
+                          offset: Offset(0, -3),
+                        ),
+                           ],
                       ),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,

@@ -3,6 +3,9 @@ import 'package:flutter_spinkit/flutter_spinkit.dart'; // Add this import for th
 import '../screens/navigation.dart';
 import '../services/devotion/auth_service.dart';
 import '../models/devotion.dart';
+import '../helper/exithelper.dart';
+
+
 
 class DevotionPage extends StatefulWidget {
   const DevotionPage({super.key});
@@ -94,7 +97,10 @@ class _DevotionPageState extends State<DevotionPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+     ModalRoute.of(context)?.addScopedWillPopCallback(() async {
+      return await showExitConfirmationDialog(context);
+    });
+   return Scaffold(
       backgroundColor: const Color(0xFFeb7f35),
       drawer: const AppDrawer(selectedItem: 'Devotion'),
       body: SafeArea(
@@ -137,7 +143,7 @@ class _DevotionPageState extends State<DevotionPage> {
                 controller: searchController,
                 onChanged: _filterDevotions,
                 decoration: InputDecoration(
-                  prefixIcon: const Icon(Icons.search),
+                  prefixIcon: const Icon(Icons.search, color: Color(0xFFeb7f35)),
                   hintText: 'Search devotions...',
                   filled: true,
                   fillColor: Colors.white,
@@ -151,18 +157,33 @@ class _DevotionPageState extends State<DevotionPage> {
             const SizedBox(height: 10),
             Expanded(
               child: Container(
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
+                    boxShadow: [
+                        BoxShadow(
+                        color: Colors.black.withOpacity(0.4),
+                        blurRadius: 10,
+                        offset: const Offset(0, -3),
+                        ),
+                      ],
                   color: Colors.white,
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
                 ),
-                child: isLoading && displayedDevotions.isEmpty
-                    ? const Center(child: CircularProgressIndicator(color: Colors.orange))
-                    : NotificationListener<ScrollNotification>(
+               child: isLoading && displayedDevotions.isEmpty
+                    ? const Center(child: CircularProgressIndicator(color: Color(0xFFeb7f35)))
+                    : !isLoading && displayedDevotions.isEmpty
+                        ? const Center(
+                            child: Text(
+                              "There are currently no devotion listed,\nPlease come back later.",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(fontSize: 16, color: Colors.black54),
+                            ),
+                          )
+                        : NotificationListener<ScrollNotification>(
                         onNotification: (ScrollNotification scrollInfo) {
                           if (!isLoading &&
                               scrollInfo.metrics.pixels == scrollInfo.metrics.maxScrollExtent) {
                             print("Reached the bottom, loading more items...");
-                            _loadMoreItems(); // Trigger lazy loading when at the bottom
+                            _loadMoreItems(); 
                           }
                           return true;
                         },
@@ -177,7 +198,7 @@ class _DevotionPageState extends State<DevotionPage> {
                                   children: [
                                     SizedBox(height: 10),
                                     SpinKitThreeBounce(
-                                      color: Colors.orange,
+                                      color: Color(0xFFeb7f35),
                                       size: 20.0,
                                     ),
                                     SizedBox(height: 10),
@@ -193,12 +214,12 @@ class _DevotionPageState extends State<DevotionPage> {
                             return Card(
                               margin: const EdgeInsets.only(bottom: 20),
                               elevation: 3,
+                              color: const Color(0xFFEB7F35),
                               shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(15)),
+                              borderRadius: BorderRadius.circular(25)),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  // Title and Dates
                                   Padding(
                                     padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
                                     child: Column(
@@ -209,6 +230,7 @@ class _DevotionPageState extends State<DevotionPage> {
                                           style: const TextStyle(
                                             fontSize: 18,
                                             fontWeight: FontWeight.bold,
+                                            color: Colors.white, 
                                           ),
                                         ),
                                         const SizedBox(height: 4),
@@ -216,7 +238,7 @@ class _DevotionPageState extends State<DevotionPage> {
                                           'Published: ${devotion.createdAt} • Devotion Date: ${devotion.devoDate}',
                                           style: const TextStyle(
                                             fontSize: 12,
-                                            color: Colors.grey,
+                                            color: Colors.white, 
                                           ),
                                         ),
                                       ],
@@ -241,7 +263,7 @@ class _DevotionPageState extends State<DevotionPage> {
                                                   height: 350,
                                                   child: const Center(
                                                     child: CircularProgressIndicator(
-                                                      color: Colors.orange,
+                                                      color: Color(0xFFFF9800),
                                                     ),
                                                   ),
                                                 );
@@ -254,7 +276,6 @@ class _DevotionPageState extends State<DevotionPage> {
                                                     ),
                                                   ),
                                             ),
-
                                     ),
                                   ),
                                 ],
