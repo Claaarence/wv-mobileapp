@@ -50,6 +50,7 @@ dependencies:
   http_parser: ^4.0.2
   path: ^1.8.3
   path_provider: ^2.1.1
+  file_picker: ^10.1.9
 
 
 flutter_launcher_icons:
@@ -130,6 +131,10 @@ flutter:
   # "family" key with the font family name, and a "fonts" key with a
   # list giving the asset and other descriptors for the font. For
   # example:
+  fonts:
+    - family: PastelCrayon
+      fonts:
+        - asset: assets/fonts/PastelCrayon.ttf
   # fonts:
   #   - family: Schyler
   #     fonts:

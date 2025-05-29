@@ -11,6 +11,7 @@ import '../services/login/auth_service.dart';
 import 'dart:convert'; 
 import 'package:shared_preferences/shared_preferences.dart';
 import '../helper/exithelper.dart';
+import 'dashboard.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -299,14 +300,15 @@ Widget build(BuildContext context) {
       return await showExitConfirmationDialog(context);
     });
   return Scaffold(
-    resizeToAvoidBottomInset: true, // This is default, but explicit here for clarity
+    resizeToAvoidBottomInset: true,
     body: Stack(
-      fit: StackFit.expand,
-      children: [
-       Stack(
+  fit: StackFit.expand,
+  children: [
+   
+Stack(
   children: [
     Transform.translate(
-      offset: Offset(0, 0), // Negative X value moves it to the left
+      offset: Offset(0, 0),
       child: Image.asset(
         'assets/hp3.png',
         fit: BoxFit.cover,
@@ -329,16 +331,19 @@ Widget build(BuildContext context) {
     ),
   ],
 ),
-        Positioned(
-          top: 50,
-          left: 20,
-          child: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.white),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
-        ),
+  Positioned(
+      top: 50,
+      left: 20,
+      child: IconButton(
+        icon: const Icon(Icons.arrow_back, color: Colors.white),
+        onPressed: () {
+          Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => DashboardPage()),
+                  );
+        },
+      ),
+    ),
         SafeArea(
   child: LayoutBuilder(
     builder: (context, constraints) {
@@ -440,14 +445,16 @@ Widget build(BuildContext context) {
                             child: TextField(
                               controller: _usernameController,
                               style: const TextStyle(color: Colors.black),
-                              decoration: InputDecoration(
-                                border: OutlineInputBorder(
+                                decoration: InputDecoration(
+                                enabledBorder: OutlineInputBorder(
                                   borderSide: const BorderSide(color: Colors.black),
-                                  borderRadius:
-                                      BorderRadius.circular(screenWidth * 0.025),
+                                  borderRadius: BorderRadius.circular(screenWidth * 0.025),
                                 ),
-                                contentPadding:
-                                    EdgeInsets.symmetric(horizontal: screenWidth * 0.03),
+                                focusedBorder: OutlineInputBorder(
+                                  borderSide: const BorderSide(color: Color(0xFFeb7f35), width: 2),
+                                  borderRadius: BorderRadius.circular(screenWidth * 0.025),
+                                ),
+                                contentPadding: EdgeInsets.symmetric(horizontal: screenWidth * 0.03),
                               ),
                             ),
                           ),
@@ -469,13 +476,15 @@ Widget build(BuildContext context) {
                               obscureText: _obscurePassword,
                               style: const TextStyle(color: Colors.black),
                               decoration: InputDecoration(
-                                border: OutlineInputBorder(
+                                enabledBorder: OutlineInputBorder(
                                   borderSide: const BorderSide(color: Colors.black),
-                                  borderRadius:
-                                      BorderRadius.circular(screenWidth * 0.025),
+                                  borderRadius: BorderRadius.circular(screenWidth * 0.025),
                                 ),
-                                contentPadding:
-                                    EdgeInsets.symmetric(horizontal: screenWidth * 0.03),
+                                focusedBorder: OutlineInputBorder(
+                                  borderSide: const BorderSide(color: Color(0xFFeb7f35), width: 2),
+                                  borderRadius: BorderRadius.circular(screenWidth * 0.025),
+                                ),
+                                contentPadding: EdgeInsets.symmetric(horizontal: screenWidth * 0.03),
                                 suffixIcon: IconButton(
                                   icon: Icon(
                                     _obscurePassword

@@ -3,6 +3,7 @@ import 'navigation.dart';
 import '/services/child/auth_service.dart';
 import '/models/child_info.dart';
 import '../helper/exithelper.dart';
+import 'package:wvmobile/screens/child_connect/connect.dart';
 
 class ChildPage extends StatefulWidget {
   const ChildPage({super.key});
@@ -10,6 +11,28 @@ class ChildPage extends StatefulWidget {
   @override
   State<ChildPage> createState() => _ChildPageState();
 }
+
+class NotepadLinesPainter extends CustomPainter {
+  final double lineSpacing;
+
+  NotepadLinesPainter({this.lineSpacing = 32.0});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = const Color(0xFFB0BEC5)
+      ..strokeWidth = 1;
+
+    for (double y = 0; y < size.height; y += lineSpacing) {
+      canvas.drawLine(Offset(0, y), Offset(size.width, y), paint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant NotepadLinesPainter oldDelegate) =>
+      oldDelegate.lineSpacing != lineSpacing;
+}
+
 
 class _ChildPageState extends State<ChildPage> {
   bool _showContent = false;
@@ -48,14 +71,14 @@ class _ChildPageState extends State<ChildPage> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.privacy_tip_rounded, size: 40, color: Colors.orange),
+                    const Icon(Icons.privacy_tip_rounded, size: 40, color: Color(0xFFeb7f35)),
                     const SizedBox(height: 12),
                     const Text(
                       'Before We Proceed',
                       style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700),
                       textAlign: TextAlign.center,
                     ),
-                    Divider(color: Colors.grey[300], thickness: 1),
+                    Divider(color: const Color(0xFFeb7f35), thickness: 1),
                     const SizedBox(height: 16),
                     const Text(
                       'To protect my sponsored child from cyber exploitation, '
@@ -64,21 +87,27 @@ class _ChildPageState extends State<ChildPage> {
                       style: TextStyle(fontSize: 16, color: Colors.black87),
                     ),
                     const SizedBox(height: 20),
-                    Divider(color: Colors.grey[300], thickness: 1),
+                    Divider(color: const Color(0xFFeb7f35), thickness: 1),
                     CheckboxListTile(
-                      value: isChecked,
-                      onChanged: (value) {
-                        setState(() {
-                          isChecked = value ?? false;
-                        });
-                      },
-                      contentPadding: EdgeInsets.zero,
-                      controlAffinity: ListTileControlAffinity.leading,
-                      title: const Text(
-                        'I understand and agree to this.',
-                        style: TextStyle(fontSize: 15),
-                      ),
-                    ),
+                          value: isChecked,
+                          onChanged: (value) {
+                            setState(() {
+                              isChecked = value ?? false;
+                            });
+                          },
+                          contentPadding: EdgeInsets.zero,
+                          controlAffinity: ListTileControlAffinity.leading,
+                          activeColor: const Color(0xFFeb7f35),
+                          checkColor: const Color.fromRGBO(255, 255, 255, 1),
+                          title: const Text(
+                            'I understand and agree to this.',
+                            style: TextStyle(
+                              fontSize: 15,
+                              color: Color.fromARGB(255, 0, 0, 0),
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
                     const SizedBox(height: 20),
                     Row(
                       children: [
@@ -109,8 +138,8 @@ class _ChildPageState extends State<ChildPage> {
                                   }
                                 : null,
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.orange,
-                              disabledBackgroundColor: Colors.orange.withOpacity(0.5),
+                              backgroundColor: const Color(0xFFeb7f35),
+                              disabledBackgroundColor: const Color(0xFFeb7f35).withOpacity(0.5),
                               foregroundColor: Colors.white,
                               padding: const EdgeInsets.symmetric(vertical: 14),
                               shape: RoundedRectangleBorder(
@@ -200,7 +229,7 @@ class _ChildPageState extends State<ChildPage> {
                               cursor: SystemMouseCursors.click,
                               child: Icon(
                                 Icons.close,
-                                color: Colors.orange,
+                                color: const Color(0xFFeb7f35),
                                 size: 30,
                               ),
                             ),
@@ -219,41 +248,76 @@ class _ChildPageState extends State<ChildPage> {
                             "Hi, I'm ${child.givenName}",
                             style: const TextStyle(
                               fontSize: 24,
+                              fontFamily: 'PastelCrayon',
                               fontWeight: FontWeight.bold,
-                              color: Colors.orange,
+                              color: Color.fromARGB(255, 0, 0, 0),
                             ),
                             textAlign: TextAlign.center,
                           ),
                         ),
-                        const SizedBox(height: 16),
-                        Divider(color: Colors.orange.withOpacity(0.3), thickness: 1.2),
                         const SizedBox(height: 20),
-                        Text(
-                          child.text,
-                          style: const TextStyle(fontSize: 16),
-                          textAlign: TextAlign.left,
+                    Container(
+                          width: double.infinity,
+                          height: 300, // fixed height to make it scrollable
+                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFFFFDE7),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: Colors.brown.shade200),
+                          ),
+                         child: ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: SingleChildScrollView(
+                              child: CustomPaint(
+                                painter: NotepadLinesPainter(lineSpacing: 36),
+                                child: Padding(
+                                  padding: const EdgeInsets.only(top: 8),
+                                  child: Text(
+                                    child.text,
+                                    style: const TextStyle(
+                                      fontSize: 20,
+                                      fontFamily: 'PastelCrayon',
+                                      fontWeight: FontWeight.bold,
+                                      height: 1.8,
+                                      color: Colors.black87,
+                                    ),
+                                    textAlign: TextAlign.left,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+
                         ),
                         const SizedBox(height: 20),
-                        Divider(color: Colors.orange.withOpacity(0.3), thickness: 1.2),
-                        const SizedBox(height: 20),
-                        SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton(
-                            onPressed: () {
-                              // Handle connect button press
+                       Center(
+                          child: SizedBox(
+                            width: 220,
+                            child: ElevatedButton(
+                               onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ConnectPage(child: child),
+                                ),
+                              );
                             },
-                            style: ElevatedButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(vertical: 14),
-                              backgroundColor: Colors.orange,
-                              foregroundColor: Colors.white,
-                              textStyle: const TextStyle(fontSize: 16),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
+                              style: ElevatedButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(vertical: 14),
+                                backgroundColor: const Color(0xFFeb7f35),
+                                foregroundColor: Colors.white,
+                                textStyle: const TextStyle(
+                                  fontSize: 16,
+                                  fontFamily: 'PastelCrayon',
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                elevation: 4,
+                                shadowColor: const Color(0xFFeb7f35),
                               ),
-                              elevation: 4,
-                              shadowColor: Colors.orangeAccent,
+                              child: const Text('Connect with Me'),
                             ),
-                            child: const Text('Connect with Me'),
                           ),
                         ),
                       ],
@@ -282,9 +346,10 @@ class _ChildPageState extends State<ChildPage> {
 
   @override
   Widget build(BuildContext context) {
-     ModalRoute.of(context)?.addScopedWillPopCallback(() async {
+    ModalRoute.of(context)?.addScopedWillPopCallback(() async {
       return await showExitConfirmationDialog(context);
     });
+
     return Scaffold(
       backgroundColor: const Color(0xFFeb7f35),
       drawer: const AppDrawer(selectedItem: 'Child'),
@@ -319,27 +384,63 @@ class _ChildPageState extends State<ChildPage> {
                   ),
                 ),
                 Expanded(
-                  child: ListView.builder(
-                    itemCount: _childData.length,
-                    itemBuilder: (context, index) {
-                      final child = _childData[index];
-                      return GestureDetector(
-                        onTap: () {
-                          _showChildDetailsModal(child); // Show modal when container is clicked
-                        },
-                        child: Card(
-                          margin: const EdgeInsets.all(16),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                          child: Padding(
-                            padding: const EdgeInsets.all(16),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
+                    child: Container(
+                      decoration: const BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black26,
+                            blurRadius: 8,
+                            offset: Offset(0, -3),
+                          ),
+                        ],
+                      ),
+                      child: ListView.builder(
+                        padding: const EdgeInsets.only(top: 16, bottom: 16),
+                        itemCount: _childData.length,
+                        itemBuilder: (context, index) {
+                          final child = _childData[index];
+                          return GestureDetector(
+                            onTap: () {
+                              _showChildDetailsModal(child);
+                            },
+                            child: Card(
+                              margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16)),
+                              child: Padding(
+                                padding: const EdgeInsets.all(16),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    CircleAvatar(
-                                      radius: 40,
-                                      backgroundImage: NetworkImage(child.thumb),
+                               Row(
+                                  children: [
+                                    Column(
+                                      children: [
+                                        CircleAvatar(
+                                          radius: 40,
+                                          backgroundImage: NetworkImage(child.thumb),
+                                        ),
+                                        const SizedBox(height: 8),
+                                        TextButton(
+                                          onPressed: () {
+                                            _showChildDetailsModal(child);
+                                          },
+                                          style: TextButton.styleFrom(
+                                            side: const BorderSide(color: Color(0xFFeb7f35)),
+                                            foregroundColor: const Color(0xFFeb7f35),
+                                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(12),
+                                            ),
+                                          ),
+                                          child: const Text(
+                                            'View',
+                                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                     const SizedBox(width: 16),
                                     Expanded(
@@ -348,31 +449,117 @@ class _ChildPageState extends State<ChildPage> {
                                         children: [
                                           Text(
                                             child.givenName,
-                                            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                                                  style: const TextStyle(
+                                                  fontSize: 20,
+                                                  fontWeight: FontWeight.w900,
+                                                  color: Color.fromARGB(255, 0, 0, 0),
+                                                ),
+                                              ),
+                                            Divider(color: const Color(0xFF9B9B9B), thickness: 1),
+                                              Text.rich(
+                                                TextSpan(
+                                                  children: [
+                                                    TextSpan(
+                                                      text: "Status: ",
+                                                      style: TextStyle(fontWeight: FontWeight.bold, color: Color.fromARGB(255, 0, 0, 0)),
+                                                      
+                                                    ),
+                                                    TextSpan(
+                                                      text: "${child.status}",
+                                                      style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFFeb7f35)),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                              Text.rich(
+                                                TextSpan(
+                                                  children: [
+                                                    TextSpan(
+                                                      text: "Gender: ",
+                                                      style: TextStyle(fontWeight: FontWeight.bold, color: Color.fromARGB(255, 0, 0, 0)),
+                                                    ),
+                                                    TextSpan(
+                                                      text: "${child.genderCode}",
+                                                      style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFFeb7f35)),
+                                                    
+                                                    
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                              Text.rich(
+                                                TextSpan(
+                                                  children: [
+                                                    TextSpan(
+                                                      text: "Birthdate: ",
+                                                      style: TextStyle(fontWeight: FontWeight.bold, color: Color.fromARGB(255, 0, 0, 0)),
+                                                    ),
+                                                    TextSpan(
+                                                      text: "${child.birthdate}",
+                                                      style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFFeb7f35)),
+                                                      ),
+                                                  ],
+                                                ),
+                                              ),
+                                              Divider(color: const Color(0xFF9B9B9B), thickness: 1),
+                                              Text.rich(
+                                                TextSpan(
+                                                  children: [
+                                                    TextSpan(
+                                                      text: "Favorite Subject: ",
+                                                      style: TextStyle(fontWeight: FontWeight.bold, color: Color.fromARGB(255, 0, 0, 0)),
+                                                    ),
+                                                    TextSpan(
+                                                      text: "${child.favoriteSubject}",
+                                                      style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFFeb7f35)),
+                                                      ),
+                                                  ],
+                                                ),
+                                              ),
+                                              Text.rich(
+                                                TextSpan(
+                                                  children: [
+                                                    TextSpan(
+                                                      text: "Favorite Play: ",
+                                                      style: TextStyle(fontWeight: FontWeight.bold, color: Color.fromARGB(255, 0, 0, 0)),
+                                                    ),
+                                                    TextSpan(
+                                                      text: "${child.favoritePlay}",
+                                                      style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFFeb7f35)),
+                                                      ),
+                                                  ],
+                                                ),
+                                              ),
+                                              Text.rich(
+                                                TextSpan(
+                                                  children: [
+                                                    TextSpan(
+                                                      text: "School Level: ",
+                                                      style: TextStyle(fontWeight: FontWeight.bold, color: Color.fromARGB(255, 0, 0, 0)),
+                                                    ),
+                                                    TextSpan(
+                                                      text: "${child.schoolLevel}",
+                                                      style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFFeb7f35)),
+                                                      ),
+                                                  ],
+                                                ),
+                                              ),
+                                              Divider(color: const Color(0xFF9B9B9B), thickness: 1),
+                                            ],
                                           ),
-                                          Divider(color: Colors.grey[300], thickness: 1),
-                                          Text("Status: ${child.status}"),
-                                          Text("Gender: ${child.genderCode}"),
-                                          Text("Birthdate: ${child.birthdate}"),
-                                          Divider(color: Colors.grey[300], thickness: 1),
-                                          Text("Favorite Subject: ${child.favoriteSubject}"),
-                                          Text("Favorite Play: ${child.favoritePlay}"),
-                                          Text("School Level: ${child.schoolLevel}"),
-                                          Divider(color: Colors.grey[300], thickness: 1),
-                                        ],
-                                      ),
+                                        ),
+                                      ],
                                     ),
-
                                   ],
                                 ),
-                              ],
+                              ),
                             ),
-                          ),
-                        ),
-                      );
-                    },
+                          );
+                        },
+                      ),
+                    ),
                   ),
-                ),
+              
               ],
             )
           : const Center(
@@ -383,3 +570,5 @@ class _ChildPageState extends State<ChildPage> {
     );
   }
 }
+
+
