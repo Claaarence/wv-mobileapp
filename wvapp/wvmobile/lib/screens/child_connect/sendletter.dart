@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:file_picker/file_picker.dart';
+
 
 class SendLetterPage extends StatefulWidget {
   final String childName;
@@ -13,37 +13,8 @@ class SendLetterPage extends StatefulWidget {
 class _SendLetterPageState extends State<SendLetterPage> {
   final TextEditingController _controller = TextEditingController();
   int _charCount = 0;
-  PlatformFile? _attachedFile;
 
-  void _pickFile() async {
-    final result = await FilePicker.platform.pickFiles();
-    if (result != null && result.files.isNotEmpty) {
-      setState(() {
-        _attachedFile = result.files.first;
-      });
-    }
-  }
-
-  void _sendLetter() {
-    final letterText = _controller.text;
-    final file = _attachedFile;
-
-    print('Sending letter: $letterText');
-    if (file != null) {
-      print('Attached file: ${file.name}');
-    }
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Letter sent successfully!')),
-    );
-
-    _controller.clear();
-    setState(() {
-      _charCount = 0;
-      _attachedFile = null;
-    });
-  }
-
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -132,31 +103,7 @@ class _SendLetterPageState extends State<SendLetterPage> {
                       const SizedBox(height: 10),
 
                       // Attach file
-                      Row(
-                        children: [
-                          ElevatedButton.icon(
-                            onPressed: _pickFile,
-                            icon: const Icon(Icons.attach_file, color: Colors.white),
-                            label: const Text("Attach File", style: TextStyle(color: Colors.white)),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFFeb7f35),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                            ),
-                          ),
-                          const SizedBox(width: 10),
-                          if (_attachedFile != null)
-                            Expanded(
-                              child: Text(
-                                _attachedFile!.name,
-                                overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(fontSize: 14, color: Colors.black87),
-                              ),
-                            ),
-                        ],
-                      ),
+                  
 
                       const SizedBox(height: 20),
 
@@ -164,7 +111,7 @@ class _SendLetterPageState extends State<SendLetterPage> {
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton.icon(
-                          onPressed: _sendLetter,
+                          onPressed: () {},
                           icon: const Icon(Icons.send, color: Colors.white),
                           label: const Text(
                             'Send',
@@ -194,3 +141,5 @@ class _SendLetterPageState extends State<SendLetterPage> {
     );
   }
 }
+
+
