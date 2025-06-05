@@ -214,159 +214,286 @@ void _showEditModal() {
     });
   }
 
-  showGeneralDialog(
-    context: context,
-    barrierDismissible: true,
-    barrierLabel: "Edit Profile",
-    transitionDuration: const Duration(milliseconds: 300),
-    pageBuilder: (context, anim1, anim2) {
-      return Center(
-        child: Material(
-          color: Colors.transparent,
-          child: Container(
-            width: MediaQuery.of(context).size.width * 0.9,
-            padding: const EdgeInsets.all(20),
-            margin: const EdgeInsets.symmetric(horizontal: 20),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: const Color(0xFFeb7f35), width: 3),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.orange.withOpacity(0.3),
-                  blurRadius: 15,
-                  offset: const Offset(0, 5),
-                ),
-              ],
-            ),
-            child: SingleChildScrollView(
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      "Edit Profile",
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: const Color(0xFFeb7f35),
-                      ),
+showGeneralDialog(
+  context: context,
+  barrierDismissible: true,
+  barrierLabel: "Edit Profile",
+  transitionDuration: const Duration(milliseconds: 300),
+  pageBuilder: (context, anim1, anim2) {
+    return Center(
+      child: Material(
+        color: Colors.transparent,
+        child: Container(
+          width: MediaQuery.of(context).size.width * 0.9,
+          margin: const EdgeInsets.symmetric(horizontal: 20),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: const Color.fromARGB(255, 110, 110, 110).withOpacity(0.7),
+                blurRadius: 12,
+                offset: const Offset(0, 7),
+              ),
+            ],
+          ),
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(0),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // HEADER
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+                    decoration: const BoxDecoration(
+                      color: Color(0xFFeb7f35),
+                      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
                     ),
-                         Text(
-                      "Change your Profile Information",
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        color: const Color.fromARGB(255, 119, 119, 119),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    _buildTextField("Name", _nameController, validatorMsg: "Name is required"),
-                    _buildTextField("Email", _emailController,
-                        keyboardType: TextInputType.emailAddress, validatorMsg: "Email is required"),
-                    _buildTextField("Address", _addressController, validatorMsg: "Address is required"),
-                    _buildTextField("Salutation", _salutationController, validatorMsg: "Salutation is required"),
-                    _buildTextField("Birthday", _birthdayController,
-                        hintText: "YYYY-MM-DD", validatorMsg: "Birthday is required"),
-                    const SizedBox(height: 25),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        TextButton(
-                          onPressed: () => Navigator.of(context).pop(),
-                          child: Text(
-                            "Cancel",
-                            style: TextStyle(color: const Color(0xFFeb7f35)),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: const [
+                        Text(
+                          "Edit Profile",
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
                           ),
                         ),
-                        const SizedBox(width: 10),
-                        ElevatedButton(
-                          onPressed: () async {
-                            if (_formKey.currentState!.validate()) {
-                              final updatedData = {
-                                "partnership_name": _nameController.text.trim(),
-                                "email": _emailController.text.trim(),
-                                "address": _addressController.text.trim(),
-                                "salutation": _salutationController.text.trim(),
-                                "birthdate": _birthdayController.text.trim(),
-                              };
-
-                              final response = await AuthService().updateProfile(updatedData);
-
-                              if (response == null) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text("Failed to update profile. Please try again.")),
-                                );
-                                return;
-                              }
-
-                              if (response.containsKey('error')) {
-                                final errors = response['error'] as Map<String, dynamic>;
-                                String errorMessages = "";
-                                errors.forEach((field, messages) {
-                                  errorMessages += messages.join(", ") + "\n";
-                                });
-
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text(errorMessages.trim())),
-                                );
-                              } else {
-                                setState(() {
-                                  profileData!["partnership_name"] = updatedData["partnership_name"];
-                                  profileData!["email"] = updatedData["email"];
-                                  profileData!["address"] = updatedData["address"];
-                                  profileData!["salutation"] = updatedData["salutation"];
-                                  profileData!["birthdate"] = updatedData["birthdate"];
-                                });
-
-                                Navigator.of(context).pop();  // Close the edit modal
-
-                                _showSuccessPopup();  // Show success modal popup
-                              }
-                            }
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFFeb7f35),
-                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
-                            ),
+                        SizedBox(height: 4),
+                        Text(
+                          "Change your Profile Information",
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white70,
                           ),
-                          child: const Text("Submit"),
                         ),
                       ],
                     ),
-                  ],
-                ),
+                  ),
+
+                  // FORM CONTENT
+                Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text("Name", style: TextStyle(fontWeight: FontWeight.bold)),
+                      _buildTextField(
+                        "", _nameController,
+                        validatorMsg: "Name is required",
+                        textColor: const Color.fromARGB(255, 0, 0, 0),
+                      ),
+                      const SizedBox(height: 10),
+
+                      const Text("Email", style: TextStyle(fontWeight: FontWeight.bold)),
+                      _buildTextField(
+                        "", _emailController,
+                        keyboardType: TextInputType.emailAddress,
+                        validatorMsg: "Email is required",
+                        textColor: const Color.fromARGB(255, 0, 0, 0),
+                      ),
+                      const SizedBox(height: 10),
+
+                      const Text("Address", style: TextStyle(fontWeight: FontWeight.bold)),
+                      _buildTextField(
+                        "", _addressController,
+                        validatorMsg: "Address is required",
+                        textColor: const Color.fromARGB(255, 0, 0, 0),
+                      ),
+                      const SizedBox(height: 10),
+
+                      const Text("Salutation", style: TextStyle(fontWeight: FontWeight.bold)),
+                      _buildTextField(
+                        "", _salutationController,
+                        validatorMsg: "Salutation is required",
+                        textColor: const Color.fromARGB(255, 0, 0, 0),
+                      ),
+                      const SizedBox(height: 10),
+
+                      const Text("Birthday", style: TextStyle(fontWeight: FontWeight.bold)),
+                      _buildTextField(
+                        "", _birthdayController,
+                        hintText: "YYYY-MM-DD",
+                        validatorMsg: "Birthday is required",
+                        textColor: const Color.fromARGB(255, 0, 0, 0),
+                      ),
+                      const SizedBox(height: 25),
+                        // BUTTONS
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.15),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ],
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: TextButton(
+                                style: TextButton.styleFrom(
+                                  backgroundColor: const Color(0xFFeb7f35),
+                                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                ),
+                                onPressed: () => Navigator.of(context).pop(),
+                                child: const Text(
+                                  "Cancel",
+                                  style: TextStyle(color: Color.fromRGBO(255, 255, 255, 1)),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Container(
+                              decoration: BoxDecoration(
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.15),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ],
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              child: ElevatedButton(
+                                onPressed: () async {
+                                  if (_formKey.currentState!.validate()) {
+                                    final updatedData = {
+                                      "partnership_name": _nameController.text.trim(),
+                                      "email": _emailController.text.trim(),
+                                      "address": _addressController.text.trim(),
+                                      "salutation": _salutationController.text.trim(),
+                                      "birthdate": _birthdayController.text.trim(),
+                                    };
+
+                                    final response = await AuthService().updateProfile(updatedData);
+
+                                    if (response == null) {
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(content: Text("Failed to update profile. Please try again.")),
+                                      );
+                                      return;
+                                    }
+
+                                    if (response.containsKey('error')) {
+                                      final errors = response['error'] as Map<String, dynamic>;
+                                      String errorMessages = "";
+                                      errors.forEach((field, messages) {
+                                        errorMessages += messages.join(", ") + "\n";
+                                      });
+
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(content: Text(errorMessages.trim())),
+                                      );
+                                    } else {
+                                      setState(() {
+                                        profileData!["partnership_name"] = updatedData["partnership_name"];
+                                        profileData!["email"] = updatedData["email"];
+                                        profileData!["address"] = updatedData["address"];
+                                        profileData!["salutation"] = updatedData["salutation"];
+                                        profileData!["birthdate"] = updatedData["birthdate"];
+                                      });
+
+                                      Navigator.of(context).pop();  // Close the edit modal
+                                      _showSuccessPopup();          // Show success modal popup
+                                    }
+                                  }
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xFFeb7f35),
+                                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                ),
+                                child: const Text(
+                                  "Submit",
+                                  style: TextStyle(color: Color.fromARGB(255, 255, 255, 255)),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
         ),
-      );
-    },
-    transitionBuilder: (context, anim1, anim2, child) {
-      return FadeTransition(
-        opacity: anim1,
-        child: ScaleTransition(
-          scale: CurvedAnimation(parent: anim1, curve: Curves.easeOutBack),
-          child: child,
-        ),
-      );
-    },
-  );
-}
-  Widget _buildTextField(String label, TextEditingController controller,
-      {TextInputType keyboardType = TextInputType.text, String? hintText, String? validatorMsg}) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
+      ),
+    );
+  },
+  transitionBuilder: (context, anim1, anim2, child) {
+    return FadeTransition(
+      opacity: anim1,
+      child: ScaleTransition(
+        scale: CurvedAnimation(parent: anim1, curve: Curves.easeOutBack),
+        child: child,
+      ),
+    );
+  },
+);
+  }
+
+Widget _buildTextField(
+  String label,
+  TextEditingController controller, {
+  TextInputType keyboardType = TextInputType.text,
+  String? hintText,
+  String? validatorMsg,
+  Color textColor = const Color(0xFFeb7f35),
+}) {
+  return Padding(
+    padding: const EdgeInsets.symmetric(vertical: 8),
+    child: Container(
+      decoration: BoxDecoration(
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.15),
+            blurRadius: 8,
+            offset: const Offset(0, 6),
+          ),
+        ],
+        borderRadius: BorderRadius.circular(12),
+      ),
       child: TextFormField(
         controller: controller,
         keyboardType: keyboardType,
+        style: TextStyle(color: textColor),
         decoration: InputDecoration(
+          // ✅ Label inside the text field
           labelText: label,
           hintText: hintText,
-          border: const OutlineInputBorder(),
+          labelStyle: TextStyle(color: textColor),
+          hintStyle: TextStyle(color: textColor.withOpacity(0.7)),
+          filled: true,
+          fillColor: const Color.fromARGB(255, 255, 255, 255),
+          enabledBorder: OutlineInputBorder(
+            borderSide: BorderSide(
+              color: const Color.fromARGB(255, 0, 0, 0),
+              width: 1.5,
+            ),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(
+              color: const Color.fromARGB(255, 0, 0, 0),
+              width: 2.0,
+            ),
+            borderRadius: BorderRadius.circular(12),
+          ),
         ),
         validator: (value) {
           if (value == null || value.isEmpty) {
@@ -375,8 +502,13 @@ void _showEditModal() {
           return null;
         },
       ),
-    );
-  }
+    ),
+  );
+}
+
+
+
+
 
   @override
   Widget build(BuildContext context) {

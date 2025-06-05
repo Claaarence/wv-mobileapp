@@ -81,7 +81,7 @@ void _showRewardModal(
   qty = 1; // <---------- comment this line to use the actual qty
   final isOutOfStock = qty == 0;
 
-  void _showSuccessOrErrorDialog(bool success) {
+  void showSuccessOrErrorDialog(bool success) {
     showGeneralDialog(
       context: context,
       barrierDismissible: false,
@@ -115,225 +115,300 @@ void _showRewardModal(
 
     // Auto dismiss after 2 seconds
     Future.delayed(const Duration(seconds: 2), () {
+      // ignore: use_build_context_synchronously
       Navigator.of(context).pop(); // dismiss success/error dialog
     });
   }
 
-  void _showConfirmationDialog() {
+  void showConfirmationDialog() {
+   showGeneralDialog(
+  context: context,
+  barrierDismissible: true,
+  barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
+  transitionDuration: const Duration(milliseconds: 300),
+  pageBuilder: (context, animation, secondaryAnimation) {
+    return Center(
+      child: Material(
+        color: Colors.transparent,
+        child: Container(
+          width: MediaQuery.of(context).size.width * 0.8,
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: const Color(0xFFeb7f35), // Dialog background
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                // ignore: deprecated_member_use
+                color: const Color.fromARGB(255, 110, 110, 110).withOpacity(0.7),
+                blurRadius: 12,
+                offset: const Offset(0, 7),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                "Confirm Redemption",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20,
+                  color: Colors.white,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 16),
+              const Text(
+                "Please be advised that the items are for pick-up at the World Vision Development Foundation located in 389 Quezon Ave., cor. West 6th st., West Triangle, QC. \n\nIf you wish to have the item/s delivered kindly let us know so we could make special arrangement.",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 12,
+                  color: Colors.white,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      side: const BorderSide(color: Colors.red),
+                      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      shadowColor: Colors.black,
+                      elevation: 8,
+                    ),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text(
+                      "Cancel",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        color: Colors.red,
+                      ),
+                    ),
+                  ),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      shadowColor: Colors.black,
+                      elevation: 4,
+                    ),
+                    onPressed: () async {
+                      Navigator.of(context).pop();
+                      final authService = AuthService();
+                      final result = await authService.redeemReward(
+                        itemId: id.toString(),
+                        qtyOrdered: 1,
+                      );
 
-
-    showGeneralDialog(
-      context: context,
-      barrierDismissible: true,
-      barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
-      transitionDuration: const Duration(milliseconds: 300),
-      pageBuilder: (context, animation, secondaryAnimation) {
-        return Center(
-          child: Material(
-            color: Colors.transparent,
-            child: Container(
-              width: MediaQuery.of(context).size.width * 0.8,
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: const Color(0xFFeb7f35), width: 1.5),
-                boxShadow: [
-                  BoxShadow(
-                    color: const Color(0xFFeb7f35).withOpacity(0.3),
-                    blurRadius: 10,
-                    offset: const Offset(0, 6),
+                      if (result != null && result['status'] == 200) {
+                        showSuccessOrErrorDialog(true);
+                      } else {
+                        showSuccessOrErrorDialog(false);
+                      }
+                    },
+                    child: const Text(
+                      "Proceed",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        color: Color(0xFFeb7f35),
+                      ),
+                    ),
                   ),
                 ],
               ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Text(
-                    "Confirm Redemption",
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20,
-                      color: Color(0xFFeb7f35),
-                    ),
-                    textAlign: TextAlign.center,
+            ],
+          ),
+        ),
+      ),
+    );
+  },
+  transitionBuilder: (context, animation, secondaryAnimation, child) {
+    return ScaleTransition(
+      scale: CurvedAnimation(parent: animation, curve: Curves.easeOutBack),
+      child: child,
+    );
+  },
+);
+  }
+
+ showGeneralDialog(
+  context: context,
+  barrierDismissible: true,
+  barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
+  transitionDuration: const Duration(milliseconds: 300),
+  pageBuilder: (context, animation, secondaryAnimation) {
+    return StatefulBuilder(
+      builder: (context, setState) {
+        double iconScale = 1.0;
+
+        return Center(
+          child: Material(
+            color: Colors.transparent,
+            child: Stack(
+              children: [
+                Container(
+                  width: MediaQuery.of(context).size.width * 0.85,
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFeb7f35),
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color.fromARGB(255, 110, 110, 110).withOpacity(0.7),
+                        blurRadius: 12,
+                        offset: const Offset(0, 7),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 16),
-                 Text(
-                    "Please be advised that the items are for pick-up at the World Vision Development Foundation located in 389 Quezon Ave., cor. West 6th st., West Triangle, QC. \n\nIf you wish to have the item/s delivered kindly let us know so we could make special arrangement.",
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 12,
-                      color: Color.fromARGB(255, 65, 65, 65),
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 24),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                   OutlinedButton(
-                      style: OutlinedButton.styleFrom(
-                        side: const BorderSide(color: Colors.red),
-                        foregroundColor: Colors.red, // text color
-                        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+                      const SizedBox(height: 24),
+                      Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.4),
+                              blurRadius: 10,
+                              offset: const Offset(0, 6),
+                            ),
+                          ],
                         ),
-                      ),
-                      onPressed: () {
-                        Navigator.of(context).pop(); // dismiss confirmation
-                      },
-                      child: const Text(
-                        "Cancel",
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
-                      ),
-                    ),
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFeb7f35),
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 12, horizontal: 24),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: Image.network(
+                            imageUrl,
+                            height: 180,
+                            fit: BoxFit.cover,
                           ),
                         ),
-                        onPressed: () async {
-                          Navigator.of(context).pop(); // dismiss confirmation
-                          final authService = AuthService();
-                          final result = await authService.redeemReward(
-                            itemId: id.toString(),
-                            qtyOrdered: 1,
-                          );
-
-                          if (result != null && result['status'] == 200) { // or check the key your API uses
-                            _showSuccessOrErrorDialog(true);
-                          } else {
-                            _showSuccessOrErrorDialog(false);
-                          }
-                        },
-                        child: const Text(
-                          "Proceed",
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                            color: Colors.white,
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        title,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 20,
+                          color: Colors.white,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        description,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Colors.white,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 24),
+                      Align(
+                        alignment: Alignment.center,
+                        child: Container(
+                          width: MediaQuery.of(context).size.width * 0.65,
+                          decoration: BoxDecoration(
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.4),
+                                blurRadius: 10,
+                                offset: const Offset(0, 5),
+                              ),
+                            ],
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                            onPressed: isOutOfStock
+                                ? null
+                                : () {
+                                    showConfirmationDialog();
+                                  },
+                            child: Text(
+                              isOutOfStock ? "Temporarily Out of Stock" : "Redeem",
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                                color: Color(0xFFeb7f35),
+                              ),
+                            ),
                           ),
                         ),
                       ),
                     ],
                   ),
-                ],
-              ),
+                ),
+                // Animated close (X) icon
+                Positioned(
+                  top: 10,
+                  right: 10,
+                  child: StatefulBuilder(
+                    builder: (context, localSetState) {
+                      return GestureDetector(
+                        onTapDown: (_) {
+                          localSetState(() => iconScale = 0.85);
+                        },
+                        onTapUp: (_) async {
+                          localSetState(() => iconScale = 1.0);
+                          await Future.delayed(const Duration(milliseconds: 100));
+                          Navigator.of(context).pop();
+                        },
+                        onTapCancel: () {
+                          localSetState(() => iconScale = 1.0);
+                        },
+                        child: AnimatedScale(
+                          scale: iconScale,
+                          duration: const Duration(milliseconds: 100),
+                          child: const Icon(
+                            Icons.close,
+                            color: Colors.white,
+                            size: 28,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
             ),
           ),
-        );
-      },
-      transitionBuilder: (context, animation, secondaryAnimation, child) {
-        return ScaleTransition(
-          scale: CurvedAnimation(parent: animation, curve: Curves.easeOutBack),
-          child: child,
         );
       },
     );
-  }
-
-  showGeneralDialog(
-    context: context,
-    barrierDismissible: true,
-    barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
-    transitionDuration: const Duration(milliseconds: 300),
-    pageBuilder: (context, animation, secondaryAnimation) {
-      return Center(
-        child: Material(
-          color: Colors.transparent,
-          child: Container(
-            width: MediaQuery.of(context).size.width * 0.85,
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: const Color(0xFFeb7f35), width: 1.5),
-              boxShadow: [
-                BoxShadow(
-                  color: const Color(0xFFeb7f35).withOpacity(0.3),
-                  blurRadius: 10,
-                  offset: const Offset(0, 6),
-                ),
-              ],
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: Image.network(imageUrl, height: 180, fit: BoxFit.cover),
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 20,
-                    color: Color(0xFFeb7f35),
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  description,
-                  style: const TextStyle(fontSize: 14, color: Colors.black87),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 24),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: isOutOfStock
-                          ? Colors.grey
-                          : const Color(0xFFeb7f35),
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                    onPressed: isOutOfStock
-                        ? null
-                        : () {
-                            // Instead of redeem directly, show confirmation dialog
-                            _showConfirmationDialog();
-                          },
-                    child: Text(
-                      isOutOfStock ? "Temporarily Out of Stock" : "Redeem",
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      );
-    },
-    transitionBuilder: (context, animation, secondaryAnimation, child) {
-      return ScaleTransition(
-        scale: CurvedAnimation(parent: animation, curve: Curves.easeOutBack),
-        child: child,
-      );
-    },
-  );
+  },
+  transitionBuilder: (context, animation, secondaryAnimation, child) {
+    return ScaleTransition(
+      scale: CurvedAnimation(parent: animation, curve: Curves.easeOutBack),
+      child: child,
+    );
+  },
+);
 }
+
 
   @override
   Widget build(BuildContext context) {
+     // ignore: deprecated_member_use
      ModalRoute.of(context)?.addScopedWillPopCallback(() async {
       return await showExitConfirmationDialog(context);
     });
@@ -440,29 +515,54 @@ void _showRewardModal(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                       ClipRRect(
-                          borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-                          child: Image.network(
-                            fullImageUrl,
-                            width: double.infinity,
-                            height: 300,
-                            fit: BoxFit.cover,
-                            loadingBuilder: (context, child, loadingProgress) {
-                              if (loadingProgress == null) return child;
-                              return Container(
-                                width: double.infinity,
-                                height: 300,
-                                color: Colors.white,
-                                child: const Center(
-                                  child: CircularProgressIndicator(
-                                    valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFeb7f35)), // orange
+                      ClipRRect( 
+                            borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                            child: Stack(
+                              children: [
+                                Image.network(
+                                  fullImageUrl,
+                                  width: double.infinity,
+                                  height: 300,
+                                  fit: BoxFit.cover,
+                                  loadingBuilder: (context, child, loadingProgress) {
+                                    if (loadingProgress == null) return child;
+                                    return Container(
+                                      width: double.infinity,
+                                      height: 300,
+                                      color: const Color(0xFFeb7f35),
+                                      child: const Center(
+                                        child: CircularProgressIndicator(
+                                          valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFFFFFF)), 
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                                Positioned(
+                                  top: 26,
+                                  right: -60, 
+                                  child: Transform.rotate(
+                                    angle: 0.785398,
+                                    child: Container(
+                                      width: 200,
+                                      padding: const EdgeInsets.symmetric(vertical: 8), 
+                                      color: const Color(0xFFeb7f35),
+                                      child: const Center(
+                                        child: Text(
+                                          'Click Me',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 16,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
                                   ),
                                 ),
-                              );
-                            },
+                              ],
+                            ),
                           ),
-                        ),
-
                           Padding(
                             padding: const EdgeInsets.all(12),
                             child: Column(

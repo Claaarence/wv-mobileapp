@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart'; 
 import 'package:http/http.dart' as http; 
@@ -6,6 +7,7 @@ import 'navigation.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_custom_tabs/flutter_custom_tabs.dart';
 import '../helper/exithelper.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:flutter/services.dart';
 
 class DonationPage extends StatefulWidget {
@@ -28,20 +30,26 @@ class _DonationPageState extends State<DonationPage> {
   }
 
   
-  Future<List<Map<String, dynamic>>?> _fetchDonationData() async {
-    final newDonations = await AuthService().fetchDonationData(lastId: lastId);
+  Future<List<Map<String, dynamic>>?> _fetchDonationData({
+  String? dateFrom,
+  String? dateTo,
+}) async {
+  final newDonations = await AuthService().fetchDonationData(
+    lastId: lastId,
+    dateFrom: dateFrom,
+    dateTo: dateTo,
+  );
 
-    if (newDonations != null && newDonations.isNotEmpty) {
-      setState(() {
-        donations.addAll(newDonations); 
-        lastId = newDonations.last['id'].toString(); 
-      });
-    }
-
-    return newDonations;
+  if (newDonations != null && newDonations.isNotEmpty) {
+    setState(() {
+      donations.addAll(newDonations);
+      lastId = newDonations.last['id'].toString();
+    });
   }
 
- 
+  return newDonations;
+}
+
   void _viewReceipt(String receiptUrl) async {
     bool isPdf = await _isPdf(receiptUrl); 
     Navigator.push(
@@ -83,42 +91,75 @@ Widget build(BuildContext context) {
       body: Column(
         children: [
       SafeArea(
-  bottom: false,
-  child: Container(
-    color: const Color(0xFFeb7f35),
-    padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12), // Reduced vertical padding
-    child: Row(
-      children: [
-        Builder(
-          builder: (context) => IconButton(
-            icon: const Icon(Icons.menu, color: Colors.white),
-            onPressed: () => Scaffold.of(context).openDrawer(),
+          bottom: false,
+          child: Container(
+            color: const Color(0xFFeb7f35),
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12), // Reduced vertical padding
+            child: Row(
+              children: [
+                Builder(
+                  builder: (context) => IconButton(
+                    icon: const Icon(Icons.menu, color: Colors.white),
+                    onPressed: () => Scaffold.of(context).openDrawer(),
+                  ),
+                ),
+                const Spacer(),
+                const Text(
+                  "Your Donations",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 26, // Slightly smaller
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                const Spacer(),
+              IconButton(
+                icon: const Icon(Icons.calendar_today, color: Colors.white),
+                onPressed: () async {
+                  final DateTimeRange? picked = await showDateRangePicker(
+                    context: context,
+                    firstDate: DateTime(2000),
+                    lastDate: DateTime.now(),
+                    initialDateRange: DateTimeRange(
+                      start: DateTime.now().subtract(const Duration(days: 30)),
+                      end: DateTime.now(),
+                    ),
+                  );
+
+                  if (picked != null) {
+                    final String dateFrom = picked.start.toIso8601String().substring(0, 10);
+                    final String dateTo = picked.end.toIso8601String().substring(0, 10);
+
+                    // Fetch the filtered data
+                    final authService = AuthService();
+                    final newDonations = await authService.fetchDonationData(
+                      dateFrom: dateFrom,
+                      dateTo: dateTo,
+                    );
+
+                    if (newDonations != null && newDonations.isNotEmpty) {
+                      setState(() {
+                        donations.clear(); // Clear existing list
+                        donations.addAll(newDonations); // Add new results
+                        lastId = newDonations.last['id'].toString(); // Update lastId
+                      });
+                    } else {
+                      setState(() {
+                        donations.clear();
+                        lastId = '';
+                      });
+                    }
+                  }
+                },
+              ),
+              ],
+            ),
           ),
         ),
-        const Spacer(),
-        const Text(
-          "Your Donations",
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            fontSize: 26, // Slightly smaller
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
-        ),
-        const Spacer(),
-        IconButton(
-          icon: const Icon(Icons.edit, color: Colors.white),
-          onPressed: () {
-            // Edit action
-          },
-        ),
-      ],
-    ),
-  ),
-),
-Expanded(
-  child: Container(
-    decoration: const BoxDecoration(
+        Expanded(
+          child: Container(
+            decoration: const BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
                            boxShadow: [
@@ -129,109 +170,156 @@ Expanded(
                         ),
                       ],
                         ),
-    padding: EdgeInsets.zero, // Removes any unexpected space
-    child: FutureBuilder<List<Map<String, dynamic>>?>(
-      future: donationData,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(
-            child: CircularProgressIndicator(color: Color(0xFFeb7f35)),
-          );
-        } else if (snapshot.hasError) {
-          return Center(child: Text('Error: ${snapshot.error}'));
-        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          return const Center(child: Text('No donation data available.'));
-        } else {
-          return NotificationListener<ScrollNotification>(
-            onNotification: (scrollNotification) {
-              if (scrollNotification is ScrollEndNotification &&
-                  !isLoading &&
-                  scrollNotification.metrics.pixels == scrollNotification.metrics.maxScrollExtent) {
-                _loadMoreData();
-              }
-              return true;
-            },
-            child: ListView.builder(
-             padding: const EdgeInsets.only(bottom: 150), // Makes sure content touches header
-              itemCount: donations.length + (isLoading ? 1 : 0),
-              itemBuilder: (context, index) {
-                if (index == donations.length && isLoading) {
-                  return const Center(
-                    child: Column(
-                      children: [
-                        SizedBox(height: 10),
-                        SpinKitThreeBounce(
-                          color: Color(0xFFeb7f35),
-                          size: 20.0,
+                        padding: EdgeInsets.zero, // Removes any unexpected space
+                        child: FutureBuilder<List<Map<String, dynamic>>?>(
+                          future: donationData,
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              return const Center(
+                                child: CircularProgressIndicator(color: Color(0xFFeb7f35)),
+                              );
+                            } else if (snapshot.hasError) {
+                              return Center(child: Text('Error: ${snapshot.error}'));
+                            } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                              return const Center(child: Text('No donation data available.'));
+                            } else {
+                              return NotificationListener<ScrollNotification>(
+                                onNotification: (scrollNotification) {
+                                  if (scrollNotification is ScrollEndNotification &&
+                                      !isLoading &&
+                                      scrollNotification.metrics.pixels == scrollNotification.metrics.maxScrollExtent) {
+                                    _loadMoreData();
+                                  }
+                                  return true;
+                                },
+                                child: ListView.builder(
+                                padding: const EdgeInsets.only(bottom: 150), // Makes sure content touches header
+                                  itemCount: donations.length + (isLoading ? 1 : 0),
+                                  itemBuilder: (context, index) {
+                                    if (index == donations.length && isLoading) {
+                                      return const Center(
+                                        child: Column(
+                                          children: [
+                                            SizedBox(height: 10),
+                                            SpinKitThreeBounce(
+                                              color: Color(0xFFeb7f35),
+                                              size: 20.0,
+                                            ),
+                                            SizedBox(height: 10),
+                                            Text(
+                                              'Loading more donations...',
+                                              style: TextStyle(color: Color(0xFFeb7f35), fontSize: 16),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    }
+                                    return _buildDonationItem(donations[index]);
+                                  },
+                                ),
+                              );
+                            }
+                          },
                         ),
-                        SizedBox(height: 10),
-                        Text(
-                          'Loading more donations...',
-                          style: TextStyle(color: Color(0xFFeb7f35), fontSize: 16),
-                        ),
-                      ],
+                      ),
                     ),
-                  );
-                }
-                return _buildDonationItem(donations[index]);
-              },
+                  ],
+                ),
+              bottomNavigationBar: Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 10,
+                  offset: const Offset(0, -3), // Shadow goes upward from bottom
+                ),
+              ],
             ),
-          );
-        }
-      },
-    ),
-  ),
-),
+            padding: const EdgeInsets.only(top: 6, bottom: 10),
+            child: SafeArea(
+              top: false,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.credit_card, size: 30, color: Color(0xFFeb7f35)),
+                        onPressed: () => _launchURL(context),
+                      ),
+                      const Text("Use Card", style: TextStyle(color: Color(0xFFeb7f35))),
+                    ],
+                  ),
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                   IconButton(
+                      icon: const Icon(Icons.upload_file, size: 30, color: Color(0xFFeb7f35)),
+                      onPressed: () async {
+                        final ImagePicker picker = ImagePicker();
+                        final authService = AuthService();
 
-        ],
-      ),
-     bottomNavigationBar: Container(
-  decoration: BoxDecoration(
-    color: Colors.white,
-    boxShadow: [
-      BoxShadow(
-        color: Colors.black.withOpacity(0.1),
-        blurRadius: 10,
-        offset: const Offset(0, -3), // Shadow goes upward from bottom
-      ),
-    ],
-  ),
-  padding: const EdgeInsets.only(top: 6, bottom: 10),
-  child: SafeArea(
-    top: false,
-    child: Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: [
-        Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            IconButton(
-              icon: const Icon(Icons.credit_card, size: 30, color: Color(0xFFeb7f35)),
-              onPressed: () => _launchURL(context),
-            ),
-            const Text("Use Card", style: TextStyle(color: Color(0xFFeb7f35))),
-          ],
-        ),
-        Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            IconButton(
-              icon: const Icon(Icons.upload_file, size: 30, color: Color(0xFFeb7f35)),
-              onPressed: () {
-                // Upload receipt action
-              },
-            ),
-            const Text("Upload Receipt", style: TextStyle(color: Color(0xFFeb7f35))),
-          ],
-        ),
-      ],
-    ),
-  ),
-),
+                        // Show dialog to choose source
+                        final source = await showModalBottomSheet<ImageSource>(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return SafeArea(
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  ListTile(
+                                    leading: const Icon(Icons.photo_camera),
+                                    title: const Text('Take Photo'),
+                                    onTap: () => Navigator.pop(context, ImageSource.camera),
+                                  ),
+                                  ListTile(
+                                    leading: const Icon(Icons.photo_library),
+                                    title: const Text('Choose from Gallery'),
+                                    onTap: () => Navigator.pop(context, ImageSource.gallery),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        );
 
-    ),
-  );
-}
+                        if (source == null) return;
+
+                        final XFile? image = await picker.pickImage(
+                          source: source,
+                          maxWidth: 800,
+                          maxHeight: 800,
+                        );
+
+                        if (image != null) {
+                          File imageFile = File(image.path);
+
+                          bool success = await authService.uploadReceiptImage(imageFile);
+                          if (success) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text("Upload successful")),
+                            );
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text("Upload failed")),
+                            );
+                          }
+                        }
+                      },
+                    ),
+
+                      const Text("Upload Deposit Slip", style: TextStyle(color: Color(0xFFeb7f35))),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+    }
 
 
 
@@ -272,139 +360,159 @@ Widget _buildDonationItem(Map<String, dynamic> donation) {
   final paymentMethod = donation['payment_method'] ?? 'N/A';
   final receiptUrl = donation['receipt_url'] ?? 'N/A';
 
-  return Padding(
+    return Padding(
     padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10),
-    child: GestureDetector(
-      onTap: () {
-        _viewReceipt(receiptUrl);
-      },
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.4),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
+    child: Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.4),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            decoration: const BoxDecoration(
+              color: Color(0xFFeb7f35),
+              borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
             ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              decoration: const BoxDecoration(
-                color: Color(0xFFeb7f35),
-                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-              ),
-              child: const Center(
-                child: Text(
-                  "Donations",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
+            child: const Center(
+              child: Text(
+                "Donations",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text.rich(
+                  TextSpan(
+                    children: [
+                      const TextSpan(
+                        text: 'ID: ',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
+                      ),
+                      TextSpan(
+                        text: id.toString(),
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  receiptDate.toString(),
+                  style: const TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
+                ),
+                const SizedBox(height: 16),
+                const Divider(
+                  color: Color(0xFFeb7f35),
+                  thickness: 1,
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    const Icon(Icons.payments, color: Color(0xFFeb7f35)),
+                    const SizedBox(width: 8),
+                    RichText(
+                      text: TextSpan(
+                        text: "Amount: ",
+                        style: const TextStyle(color: Colors.black),
+                        children: [
+                          TextSpan(
+                            text: "\₱ $amount",
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+              const SizedBox(height: 8),
+              Row(
                 children: [
-                  Text.rich(
-                    TextSpan(
-                      children: [
-                        const TextSpan(
-                          text: 'ID: ',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
-                          ),
-                        ),
-                        TextSpan(
-                          text: id.toString(),
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    receiptDate.toString(),
-                    style: const TextStyle(color: Colors.grey),
-                  ),
-                  const SizedBox(height: 16),
-                  const Divider(
-                    color: Color(0xFFeb7f35),
-                    thickness: 1,
-                  ),
-                  const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      const Icon(Icons.payments, color: Color(0xFFeb7f35)),
-                      const SizedBox(width: 8),
-                      RichText(
-                        text: TextSpan(
-                          text: "Amount: ",
-                          style: const TextStyle(color: Colors.black),
-                          children: [
-                            TextSpan(
-                              text: "\₱ $amount",
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                              ),
+                  const Icon(Icons.credit_card, color: Color(0xFFeb7f35)),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: RichText(
+                      text: TextSpan(
+                        text: "Payment Method: ",
+                        style: const TextStyle(color: Colors.black),
+                        children: [
+                          TextSpan(
+                            text: paymentMethod,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
                             ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      const Icon(Icons.credit_card, color: Color(0xFFeb7f35)),
-                      const SizedBox(width: 8),
-                      RichText(
-                        text: TextSpan(
-                          text: "Payment Method: ",
-                          style: const TextStyle(color: Colors.black),
-                          children: [
-                            TextSpan(
-                              text: paymentMethod,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-
-                  Center(
-                    child: Text(
-                      "Tap this to view receipt >",
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.grey,
+                          ),
+                        ],
                       ),
                     ),
                   ),
-                ],
-              ),
+                  const SizedBox(width: 8),
+                  Container(
+                    decoration: BoxDecoration(
+                      boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.3),
+                    blurRadius: 6,
+                    offset: const Offset(0, 5),
+                        ),
+                              ],
+                              borderRadius: BorderRadius.circular(18),
+                            ),
+                            child: OutlinedButton(
+                              style: OutlinedButton.styleFrom(
+                                backgroundColor: const Color(0xFFeb7f35),
+                                foregroundColor: Colors.white,
+                                side: const BorderSide(color: Color(0xFFeb7f35)),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(13),
+                                ),
+                                padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
+                              ),
+                              onPressed: () {
+                                _viewReceipt(receiptUrl);
+                              },
+                              child: const Text(
+                                "View Receipt",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 12,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     ),
   );

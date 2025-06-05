@@ -133,9 +133,46 @@ Widget buildMainContent(BuildContext context) {
   return Stack(
     children: [
       Positioned.fill(
-        child: Container(
-          color: const Color(0xFFeb7f35),
-        ),
+       child: Column(
+  children: [
+    // Top 20% image with gradient overlay
+    Expanded(
+      flex: 5, // 20%
+      child: Stack(
+        children: [
+          Positioned.fill(
+            child: Image.asset(
+              'assets/hp.jpg', // Replace with your image
+              fit: BoxFit.cover,
+            ),
+          ),
+          Positioned.fill(
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.black.withOpacity(0.5),
+                    const Color.fromARGB(255, 255, 102, 0).withOpacity(0.47),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    ),
+
+    // Remaining 80% empty or with other content
+    Expanded(
+      flex: 8,
+      child: Container(
+        color: Colors.white, // Change this if needed
+      ),
+    ),
+  ],
+),
       ),
           Positioned.fill(
             child: Column(
@@ -183,105 +220,122 @@ Widget buildMainContent(BuildContext context) {
               ),
 
                 Expanded(
-                  flex: 2,
-                  child: Container(
-                    width: double.infinity,
-                    color: Colors.transparent,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: Row(
-                        children: [
-                          // Greeting text
-                          Expanded(
-                            flex: 6,
+                      flex: 2,
+                      child: LayoutBuilder(
+                        builder: (context, constraints) {
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
                             child: Column(
-                              mainAxisSize: MainAxisSize.min,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                FittedBox(
-                                  fit: BoxFit.scaleDown,
-                                  alignment: Alignment.centerLeft,
-                                  child: Text(
-                                    "Hello $userName!",
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 45,
-                                      fontWeight: FontWeight.bold,
+                                // Row: Hello + Logo
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    // Greeting text
+                                    Expanded(
+                                      flex: 6,
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            FittedBox(
+                                              fit: BoxFit.scaleDown,
+                                              alignment: Alignment.centerLeft,
+                                              child: Text(
+                                                "Hello $userName!",
+                                                style: const TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 45,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            ),
+                                            const Text(
+                                              "Glad to have you here!",
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 20,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
                                     ),
-                                    overflow: TextOverflow.ellipsis,
+
+                                    // WV Logo
+                                    Flexible(
+                                      flex: 4,
+                                      child: Align(
+                                        alignment: Alignment.center,
+                                        child: Image.asset(
+                                          "assets/wvlogowhite.png",
+                                          width: constraints.maxWidth * 0.4,
+                                          height: 100,
+                                          fit: BoxFit.contain,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+
+                                const SizedBox(height: 12),
+
+                                // Vision text (spans below the entire row)
+                                Container(
+                                  width: double.infinity,
+                                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                                  child: const Text(
+                                    "Our vision for every child, life in all its fullness. Our prayer for every heart, the will to make it so.",
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w400,
+                                    ),
+                                    textAlign: TextAlign.start,
                                   ),
                                 ),
-                                const SizedBox(height: 10),
-                                const Text(
-                                  "Glad to have you here!",
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
+
+                                const SizedBox(height: 8),
                               ],
                             ),
-                          ),
-
-                          const SizedBox(width: 10),
-
-                          // Star image
-                          Flexible(
-                            flex: 4,
-                            child: AnimatedOpacity(
-                              duration: const Duration(seconds: 1),
-                              opacity: starOpacity,
-                              child: Image.asset(
-                                "assets/star2.png",
-                                width: MediaQuery.of(context).size.width * 0.25,
-                                height: 100,
-                                fit: BoxFit.contain,
-                              ),
-                            ),
-                          ),
-                        ],
+                          );
+                        },
                       ),
                     ),
-                  ),
-                ),
+
                 Expanded(
                   flex: 8,
-                  child: Stack(
-                    children: [
-                      Positioned.fill(
-                        child: Container(
-                          decoration: const BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+                  child: Container(
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
                       boxShadow: [
                         BoxShadow(
                           color: Colors.black26,
-                          blurRadius: 8,
-                          offset: Offset(0, -3),
+                          blurRadius: 11,
+                          offset: Offset(0, -9),
                         ),
                       ],
-                          ),
-                          
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                        child: ListView(
-                          padding: EdgeInsets.zero,
-                          children: [
-                            buildCard("Child Updates", "assets/bgdash.jpg"),
-                            const SizedBox(height: 16),
-                            buildCard("Community Updates", "assets/community.png"),
-                            const SizedBox(height: 16),
-                            buildCard("Campaigns", "assets/campaigns.png"),
-                            const SizedBox(height: 16),
-                          ],
-                        ),
-                      ),
-                    ],
+                    ),
+                    child: ListView(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                      children: [
+                        buildCard("Child Updates", "assets/bgdash.jpg"),
+                        const SizedBox(height: 16),
+                        buildCard("Community Updates", "assets/community.png"),
+                        const SizedBox(height: 16),
+                        buildCard("Campaigns", "assets/campaigns.png"),
+                        const SizedBox(height: 16),
+                      ],
+                    ),
                   ),
                 ),
+
               ],
             ),
           ),
