@@ -57,7 +57,7 @@ Future<void> _submitFeedback() async {
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: const [
-                  Icon(Icons.check_circle, color: Colors.orange, size: 50),
+                  Icon(Icons.check_circle, color: Color(0xFFeb7f35), size: 50),
                   SizedBox(height: 16),
                   Text(
                     "Your feedback has been sent!",
@@ -194,7 +194,6 @@ Future<void> _submitFeedback() async {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                // Header with orange background and white text
                                 Container(
                                   width: double.infinity,
                                   padding: const EdgeInsets.all(16),
@@ -261,7 +260,7 @@ Future<void> _submitFeedback() async {
                                                   size: 20, color: Color(0xFFeb7f35)),
                                               SizedBox(width: 10),
                                               Text("World Vision Philippines",
-                                                  style: TextStyle(color: Color(0xFFeb7f35))),
+                                                  style: TextStyle(color: Color.fromARGB(255, 0, 0, 0), fontWeight: FontWeight.bold)),
                                             ],
                                           ),
                                           SizedBox(height: 10),
@@ -271,7 +270,7 @@ Future<void> _submitFeedback() async {
                                                   size: 20, color: Color(0xFFeb7f35)),
                                               SizedBox(width: 10),
                                               Text("@worldvisionph",
-                                                  style: TextStyle(color: Color(0xFFeb7f35))),
+                                                  style: TextStyle(color: Color.fromARGB(255, 0, 0, 0), fontWeight: FontWeight.bold)),
                                             ],
                                           ),
                                           SizedBox(height: 10),
@@ -281,7 +280,7 @@ Future<void> _submitFeedback() async {
                                                   size: 20, color: Color(0xFFeb7f35)),
                                               SizedBox(width: 10),
                                               Text("@worldvisionphl",
-                                                  style: TextStyle(color: Color(0xFFeb7f35))),
+                                                  style: TextStyle(color: Color.fromARGB(255, 0, 0, 0), fontWeight: FontWeight.bold)),
                                             ],
                                           ),
                                           SizedBox(height: 10),
@@ -291,7 +290,7 @@ Future<void> _submitFeedback() async {
                                                   size: 20, color: Color(0xFFeb7f35)),
                                               SizedBox(width: 10),
                                               Text("@worldvisionph",
-                                                  style: TextStyle(color: Color(0xFFeb7f35))),
+                                                  style: TextStyle(color: Color.fromARGB(255, 0, 0, 0), fontWeight: FontWeight.bold)),
                                             ],
                                           ),
                                         ],
@@ -337,7 +336,7 @@ Future<void> _submitFeedback() async {
                                       ),
                                       focusedBorder: OutlineInputBorder(
                                         borderRadius: BorderRadius.circular(12),
-                                        borderSide: const BorderSide(color: Colors.orange, width: 2),
+                                        borderSide: const BorderSide(color: Color(0xFFeb7f35), width: 2),
                                       ),
                                       border: OutlineInputBorder(
                                         borderRadius: BorderRadius.circular(12),
@@ -353,7 +352,7 @@ Future<void> _submitFeedback() async {
                                             ElevatedButton.icon(
                                               onPressed: isSubmitting ? null : _submitFeedback,
                                               style: ElevatedButton.styleFrom(
-                                                backgroundColor: Colors.orange,
+                                                backgroundColor: const Color(0xFFeb7f35),
                                                 padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
                                                 shape: RoundedRectangleBorder(
                                                   borderRadius: BorderRadius.circular(16),

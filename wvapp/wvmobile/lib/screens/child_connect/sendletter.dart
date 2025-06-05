@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-
+import '/services/sendletter/auth_service.dart'; // ✅ your existing AuthService path
 
 class SendLetterPage extends StatefulWidget {
   final String childName;
+  final String childId;
 
-  const SendLetterPage({super.key, required this.childName});
+  const SendLetterPage({super.key, required this.childName, required this.childId});
 
   @override
   State<SendLetterPage> createState() => _SendLetterPageState();
@@ -13,8 +14,83 @@ class SendLetterPage extends StatefulWidget {
 class _SendLetterPageState extends State<SendLetterPage> {
   final TextEditingController _controller = TextEditingController();
   int _charCount = 0;
+  final LetterAuthService _authService = LetterAuthService(); // ✅ use your separated service
 
-  
+  Future<void> _sendLetter() async {
+  final message = _controller.text.trim();
+
+  if (message.isEmpty) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Please write a message.')),
+    );
+    return;
+  }
+
+  try {
+    bool success = await _authService.sendLetter(
+      message: message,
+      childId: widget.childId,
+    );
+
+    if (success) {
+      showSuccessOrErrorDialog(true);
+      // Wait 2 seconds then pop this SendLetterPage
+      await Future.delayed(const Duration(seconds: 2));
+      if (mounted) {
+        Navigator.of(context).pop(); // Close SendLetterPage
+      }
+    } else {
+      showSuccessOrErrorDialog(false);
+    }
+  } catch (e) {
+    print("❌ Send error: $e");
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Error: ${e.toString()}')),
+    );
+  }
+}
+
+// Add this method inside your State class
+void showSuccessOrErrorDialog(bool success) {
+  showGeneralDialog(
+    context: context,
+    barrierDismissible: false,
+    barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
+    transitionDuration: const Duration(milliseconds: 300),
+    pageBuilder: (context, animation, secondaryAnimation) {
+      return Center(
+        child: Material(
+          color: Colors.transparent,
+          child: Container(
+            width: MediaQuery.of(context).size.width * 0.6,
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: success ? Colors.green[300] : Colors.red[300],
+              borderRadius: BorderRadius.circular(15),
+            ),
+            child: Text(
+              success ? "Successfully sent!" : "Sending failed.",
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ),
+      );
+    },
+  );
+
+  // Auto dismiss after 2 seconds
+  Future.delayed(const Duration(seconds: 2), () {
+    if (mounted) {
+      Navigator.of(context).pop(); // dismiss success/error dialog
+    }
+  });
+}
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -58,7 +134,6 @@ class _SendLetterPageState extends State<SendLetterPage> {
                   padding: const EdgeInsets.all(16),
                   child: Column(
                     children: [
-                      // Notebook-style label
                       Container(
                         width: double.infinity,
                         padding: const EdgeInsets.all(8),
@@ -77,12 +152,10 @@ class _SendLetterPageState extends State<SendLetterPage> {
                           ),
                         ),
                       ),
-
-                      // Text area with counter
                       TextField(
                         controller: _controller,
                         maxLines: 8,
-                        maxLength: 300,
+                        maxLength: 1000,
                         onChanged: (value) {
                           setState(() {
                             _charCount = value.length;
@@ -100,18 +173,11 @@ class _SendLetterPageState extends State<SendLetterPage> {
                           counterStyle: const TextStyle(color: Colors.grey),
                         ),
                       ),
-                      const SizedBox(height: 10),
-
-                      // Attach file
-                  
-
                       const SizedBox(height: 20),
-
-                      // Send button
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton.icon(
-                          onPressed: () {},
+                          onPressed: _sendLetter,
                           icon: const Icon(Icons.send, color: Colors.white),
                           label: const Text(
                             'Send',
@@ -141,5 +207,3 @@ class _SendLetterPageState extends State<SendLetterPage> {
     );
   }
 }
-
-

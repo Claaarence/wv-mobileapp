@@ -250,108 +250,150 @@ void _showRewardModal(
   barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
   transitionDuration: const Duration(milliseconds: 300),
   pageBuilder: (context, animation, secondaryAnimation) {
-    return Center(
-      child: Material(
-        color: Colors.transparent,
-        child: Container(
-          width: MediaQuery.of(context).size.width * 0.85,
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: const Color(0xFFeb7f35),
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: [
-              BoxShadow(
-                // ignore: deprecated_member_use
-                color: const Color.fromARGB(255, 110, 110, 110).withOpacity(0.7),
-                blurRadius: 12,
-                offset: const Offset(0, 7),
-              ),
-            ],
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Image with shadow
-              Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
-                    BoxShadow(
-                      // ignore: deprecated_member_use
-                      color: Colors.black.withOpacity(0.4),
-                      blurRadius: 10,
-                      offset: const Offset(0, 6),
-                    ),
-                  ],
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: Image.network(imageUrl, height: 180, fit: BoxFit.cover),
-                ),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                title,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 20,
-                  color: Colors.white,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 12),
-              Text(
-                description,
-                style: const TextStyle(
-                  fontSize: 14,
-                  color: Colors.white,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 24),
-              Align(
-                alignment: Alignment.center,
-                child: Container(
-                  width: MediaQuery.of(context).size.width * 0.65,
+    return StatefulBuilder(
+      builder: (context, setState) {
+        double iconScale = 1.0;
+
+        return Center(
+          child: Material(
+            color: Colors.transparent,
+            child: Stack(
+              children: [
+                Container(
+                  width: MediaQuery.of(context).size.width * 0.85,
+                  padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
+                    color: const Color(0xFFeb7f35),
+                    borderRadius: BorderRadius.circular(20),
                     boxShadow: [
                       BoxShadow(
-                        // ignore: deprecated_member_use
-                        color: Colors.black.withOpacity(0.4),
-                        blurRadius: 10,
-                        offset: const Offset(0, 5),
+                        color: const Color.fromARGB(255, 110, 110, 110).withOpacity(0.7),
+                        blurRadius: 12,
+                        offset: const Offset(0, 7),
                       ),
                     ],
-                    borderRadius: BorderRadius.circular(10),
                   ),
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const SizedBox(height: 24),
+                      Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.4),
+                              blurRadius: 10,
+                              offset: const Offset(0, 6),
+                            ),
+                          ],
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: Image.network(
+                            imageUrl,
+                            height: 180,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
                       ),
-                    ),
-                    onPressed: isOutOfStock
-                        ? null
-                        : () {
-                            showConfirmationDialog();
-                          },
-                    child: Text(
-                      isOutOfStock ? "Temporarily Out of Stock" : "Redeem",
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                        color: Color(0xFFeb7f35),
+                      const SizedBox(height: 16),
+                      Text(
+                        title,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 20,
+                          color: Colors.white,
+                        ),
+                        textAlign: TextAlign.center,
                       ),
-                    ),
+                      const SizedBox(height: 12),
+                      Text(
+                        description,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Colors.white,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 24),
+                      Align(
+                        alignment: Alignment.center,
+                        child: Container(
+                          width: MediaQuery.of(context).size.width * 0.65,
+                          decoration: BoxDecoration(
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.4),
+                                blurRadius: 10,
+                                offset: const Offset(0, 5),
+                              ),
+                            ],
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                            onPressed: isOutOfStock
+                                ? null
+                                : () {
+                                    showConfirmationDialog();
+                                  },
+                            child: Text(
+                              isOutOfStock ? "Temporarily Out of Stock" : "Redeem",
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                                color: Color(0xFFeb7f35),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ),
-            ],
+                // Animated close (X) icon
+                Positioned(
+                  top: 10,
+                  right: 10,
+                  child: StatefulBuilder(
+                    builder: (context, localSetState) {
+                      return GestureDetector(
+                        onTapDown: (_) {
+                          localSetState(() => iconScale = 0.85);
+                        },
+                        onTapUp: (_) async {
+                          localSetState(() => iconScale = 1.0);
+                          await Future.delayed(const Duration(milliseconds: 100));
+                          Navigator.of(context).pop();
+                        },
+                        onTapCancel: () {
+                          localSetState(() => iconScale = 1.0);
+                        },
+                        child: AnimatedScale(
+                          scale: iconScale,
+                          duration: const Duration(milliseconds: 100),
+                          child: const Icon(
+                            Icons.close,
+                            color: Colors.white,
+                            size: 28,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   },
   transitionBuilder: (context, animation, secondaryAnimation, child) {
@@ -362,6 +404,7 @@ void _showRewardModal(
   },
 );
 }
+
 
   @override
   Widget build(BuildContext context) {

@@ -115,7 +115,7 @@ Widget build(BuildContext context) {
                                             margin: const EdgeInsets.only(bottom: 12),
                                             padding: const EdgeInsets.all(12),
                                             decoration: BoxDecoration(
-                                              color: Colors.white, // changed from orange.shade50 to pure white
+                                              color: Colors.white, 
                                               borderRadius: BorderRadius.circular(12),
                                               boxShadow: [
                                                 BoxShadow(
@@ -169,7 +169,7 @@ Widget build(BuildContext context) {
                                                         style: TextStyle(
                                                           fontSize: 14,
                                                           fontStyle: FontStyle.italic,
-                                                          color: Color(0xFFeb7f35), // orange accent
+                                                          color: Color(0xFFeb7f35),
                                                           fontWeight: FontWeight.w600,
                                                         ),
                                                       ),

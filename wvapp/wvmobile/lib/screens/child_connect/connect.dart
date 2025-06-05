@@ -26,10 +26,10 @@ class ConnectPage extends StatelessWidget {
       );
       break;
     case 'Send Letter':
-      destination = SendLetterPage(childName: child.givenName);
+      destination = SendLetterPage(childName: child.givenName, childId: child.childId,);
       break;
     case 'View Letters':
-      destination = const ViewLettersPage();
+      destination = ViewLettersPage(childId: child.childId);
       break;
     case 'Child Visit':
       destination = const ChildVisitPage();

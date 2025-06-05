@@ -20,7 +20,7 @@ class NotepadLinesPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = const Color(0xFFB0BEC5)
+      ..color = const Color(0xFFeb7f35).withOpacity(0.5) // soft orange lines
       ..strokeWidth = 1;
 
     for (double y = 0; y < size.height; y += lineSpacing) {
@@ -32,6 +32,7 @@ class NotepadLinesPainter extends CustomPainter {
   bool shouldRepaint(covariant NotepadLinesPainter oldDelegate) =>
       oldDelegate.lineSpacing != lineSpacing;
 }
+
 
 
 class _ChildPageState extends State<ChildPage> {
@@ -188,14 +189,16 @@ class _ChildPageState extends State<ChildPage> {
   }
 
   // Method to show the child details modal
- void _showChildDetailsModal(ChildInfo child) {
+void _showChildDetailsModal(ChildInfo child) {
   showGeneralDialog(
     context: context,
     barrierDismissible: true,
     barrierLabel: 'Child Details',
-    barrierColor: Colors.black.withOpacity(0.5),
+    barrierColor: Colors.black.withOpacity(0.6),
     transitionDuration: const Duration(milliseconds: 300),
     pageBuilder: (context, animation, secondaryAnimation) {
+      double iconScale = 1.0; // local state for icon scale
+
       return StatefulBuilder(
         builder: (context, setState) {
           return Center(
@@ -203,16 +206,17 @@ class _ChildPageState extends State<ChildPage> {
               color: Colors.transparent,
               child: Container(
                 width: MediaQuery.of(context).size.width * 0.85,
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.95),
+                  color: const Color(0xFFeb7f35).withOpacity(1),
                   borderRadius: BorderRadius.circular(24),
+                  border: Border.all(color: Colors.black.withOpacity(0.1), width: 1.5),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.2),
-                      spreadRadius: 5,
-                      blurRadius: 15,
-                      offset: const Offset(0, 3),
+                      color: const Color.fromARGB(255, 255, 255, 255).withOpacity(0.3),
+                      spreadRadius: 4,
+                      blurRadius: 20,
+                      offset: const Offset(0, 6),
                     ),
                   ],
                 ),
@@ -224,62 +228,85 @@ class _ChildPageState extends State<ChildPage> {
                         Align(
                           alignment: Alignment.topRight,
                           child: GestureDetector(
-                            onTap: () => Navigator.of(context).pop(),
+                            onTapDown: (_) {
+                              setState(() => iconScale = 0.85);
+                            },
+                            onTapUp: (_) async {
+                              setState(() => iconScale = 1.0);
+                              await Future.delayed(const Duration(milliseconds: 100));
+                              Navigator.of(context).pop();
+                            },
+                            onTapCancel: () {
+                              setState(() => iconScale = 1.0);
+                            },
                             child: MouseRegion(
                               cursor: SystemMouseCursors.click,
-                              child: Icon(
-                                Icons.close,
-                                color: const Color(0xFFeb7f35),
-                                size: 30,
+                              child: AnimatedScale(
+                                scale: iconScale,
+                                duration: const Duration(milliseconds: 100),
+                                child: const Icon(
+                                  Icons.close,
+                                  color: Color.fromARGB(255, 255, 255, 255),
+                                  size: 26,
+                                ),
                               ),
                             ),
                           ),
                         ),
-                        const SizedBox(height: 8),
+
+                        const SizedBox(height: 12),
                         Center(
                           child: CircleAvatar(
                             radius: 70,
                             backgroundImage: NetworkImage(child.thumb),
                           ),
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 20),
                         Center(
                           child: Text(
                             "Hi, I'm ${child.givenName}",
                             style: const TextStyle(
-                              fontSize: 24,
+                              fontSize: 26,
                               fontFamily: 'PastelCrayon',
-                              fontWeight: FontWeight.bold,
-                              color: Color.fromARGB(255, 0, 0, 0),
+                              fontWeight: FontWeight.w400,
+                              color: Color.fromARGB(255, 255, 255, 255),
+                              height: 1.3,
+                              shadows: [
+                                Shadow(
+                                  offset: Offset(0, 0.5),
+                                  blurRadius: 1.0,
+                                  color: Color.fromARGB(255, 255, 255, 255),
+                                ),
+                              ],
                             ),
                             textAlign: TextAlign.center,
                           ),
                         ),
-                        const SizedBox(height: 20),
-                    Container(
+                        const SizedBox(height: 24),
+                        Container(
                           width: double.infinity,
-                          height: 300, // fixed height to make it scrollable
-                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+                          height: 300,
+                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFFFFDE7),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: Colors.brown.shade200),
+                            color: const Color.fromARGB(255, 255, 255, 255).withOpacity(1),
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(color: const Color(0xFFeb7f35), width: 1),
                           ),
-                         child: ClipRRect(
+                          child: ClipRRect(
                             borderRadius: BorderRadius.circular(12),
                             child: SingleChildScrollView(
                               child: CustomPaint(
                                 painter: NotepadLinesPainter(lineSpacing: 36),
                                 child: Padding(
-                                  padding: const EdgeInsets.only(top: 8),
+                                  padding: const EdgeInsets.only(top: 10),
                                   child: Text(
                                     child.text,
                                     style: const TextStyle(
                                       fontSize: 20,
                                       fontFamily: 'PastelCrayon',
-                                      fontWeight: FontWeight.bold,
+                                      fontWeight: FontWeight.w400,
                                       height: 1.8,
-                                      color: Colors.black87,
+                                      color: Color.fromARGB(206, 0, 0, 0),
                                     ),
                                     textAlign: TextAlign.left,
                                   ),
@@ -287,34 +314,34 @@ class _ChildPageState extends State<ChildPage> {
                               ),
                             ),
                           ),
-
                         ),
-                        const SizedBox(height: 20),
-                       Center(
+                        const SizedBox(height: 28),
+                        Center(
                           child: SizedBox(
-                            width: 220,
+                            width: 230,
                             child: ElevatedButton(
-                               onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => ConnectPage(child: child),
-                                ),
-                              );
-                            },
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => ConnectPage(child: child),
+                                  ),
+                                );
+                              },
                               style: ElevatedButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(vertical: 14),
-                                backgroundColor: const Color(0xFFeb7f35),
-                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(vertical: 16),
+                                backgroundColor: const Color(0xFFFFFFFF),
+                                foregroundColor: const Color(0xFFeb7f35),
                                 textStyle: const TextStyle(
-                                  fontSize: 16,
+                                  fontSize: 18,
                                   fontFamily: 'PastelCrayon',
+                                  fontWeight: FontWeight.w400,
                                 ),
                                 shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
+                                  borderRadius: BorderRadius.circular(14),
                                 ),
-                                elevation: 4,
-                                shadowColor: const Color(0xFFeb7f35),
+                                elevation: 6,
+                                shadowColor: const Color(0xFFFFFFFF).withOpacity(0.6),
                               ),
                               child: const Text('Connect with Me'),
                             ),
