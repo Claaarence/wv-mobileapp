@@ -7,47 +7,6 @@
                     <view key="view" contentMode="scaleToFill" id="Ze5-6b-2t3" userLabel="LaunchScreenView">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <color key="backgroundColor" red="1.0" green="0.4" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                        <subviews>
-                            <!-- Logo -->
-                            <imageView contentMode="scaleAspectFit" translatesAutoresizingMaskIntoConstraints="NO" image="wvlogowhite" id="logo1">
-                            </imageView>
-
-                            <!-- Second Image -->
-                            <imageView contentMode="scaleAspectFit" translatesAutoresizingMaskIntoConstraints="NO" image="wv2" id="logo2">
-                            </imageView>
-
-                            <!-- Optional Star Image -->
-                            <imageView contentMode="scaleAspectFit" translatesAutoresizingMaskIntoConstraints="NO" image="star2" id="star">
-                            </imageView>
-
-                            <!-- Footer Text -->
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" text="www.worldvision.org.ph" textAlignment="center" lineBreakMode="tailTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="footer">
-                                <fontDescription key="fontDescription" type="boldSystem" pointSize="16"/>
-                                <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                            </label>
-                        </subviews>
-
-                        <constraints>
-                            <!-- Logo1 constraints -->
-                            <constraint firstItem="logo1" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX"/>
-                            <constraint firstItem="logo1" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" constant="-100"/>
-                            <constraint firstItem="logo1" firstAttribute="width" secondItem="Ze5-6b-2t3" secondAttribute="width" multiplier="0.6"/>
-
-                            <!-- Logo2 constraints -->
-                            <constraint firstItem="logo2" firstAttribute="top" secondItem="logo1" secondAttribute="bottom" constant="40"/>
-                            <constraint firstItem="logo2" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX"/>
-                            <constraint firstItem="logo2" firstAttribute="width" secondItem="Ze5-6b-2t3" secondAttribute="width" multiplier="0.4"/>
-
-                            <!-- Star constraints -->
-                            <constraint firstItem="star" firstAttribute="top" secondItem="logo2" secondAttribute="bottom" constant="30"/>
-                            <constraint firstItem="star" firstAttribute="right" secondItem="Ze5-6b-2t3" secondAttribute="right" constant="-60"/>
-                            <constraint firstItem="star" firstAttribute="width" constant="50"/>
-                            <constraint firstItem="star" firstAttribute="height" constant="50"/>
-
-                            <!-- Footer text constraints -->
-                            <constraint firstItem="footer" firstAttribute="bottom" secondItem="Ze5-6b-2t3" secondAttribute="bottom" constant="-40"/>
-                            <constraint firstItem="footer" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX"/>
-                        </constraints>
                     </view>
                 </viewController>
             </objects>
