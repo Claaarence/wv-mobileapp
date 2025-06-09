@@ -37,8 +37,6 @@ Future<bool> sendLetter({
     print('📤 Response Body: ${res.body}');
 
    if (res.statusCode == 200) {
-  // The API returns a JSON array like ["success"], not a Map.
-  // So just check if the response body contains the word "success".
   if (res.body.contains('success')) {
     return true;
   } else {
