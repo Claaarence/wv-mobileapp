@@ -1,37 +1,56 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="12121" systemVersion="16G29" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" launchScreen="YES" colorMatched="YES" initialViewController="01J-lp-oVM">
-    <dependencies>
-        <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12089"/>
-    </dependencies>
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="16096" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" launchScreen="YES" initialViewController="01J-lp-oVM">
     <scenes>
-        <!--View Controller-->
         <scene sceneID="EHf-IW-A2E">
             <objects>
                 <viewController id="01J-lp-oVM" sceneMemberID="viewController">
-                    <layoutGuides>
-                        <viewControllerLayoutGuide type="top" id="Ydg-fD-yQy"/>
-                        <viewControllerLayoutGuide type="bottom" id="xbc-2k-c8Z"/>
-                    </layoutGuides>
-                    <view key="view" contentMode="scaleToFill" id="Ze5-6b-2t3">
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                    <view key="view" contentMode="scaleToFill" id="Ze5-6b-2t3" userLabel="LaunchScreenView">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <color key="backgroundColor" red="1.0" green="0.4" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <subviews>
-                            <imageView opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" image="LaunchImage" translatesAutoresizingMaskIntoConstraints="NO" id="YRO-k0-Ey4">
+                            <!-- Logo -->
+                            <imageView contentMode="scaleAspectFit" translatesAutoresizingMaskIntoConstraints="NO" image="wvlogowhite" id="logo1">
                             </imageView>
+
+                            <!-- Second Image -->
+                            <imageView contentMode="scaleAspectFit" translatesAutoresizingMaskIntoConstraints="NO" image="wv2" id="logo2">
+                            </imageView>
+
+                            <!-- Optional Star Image -->
+                            <imageView contentMode="scaleAspectFit" translatesAutoresizingMaskIntoConstraints="NO" image="star2" id="star">
+                            </imageView>
+
+                            <!-- Footer Text -->
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" text="www.worldvision.org.ph" textAlignment="center" lineBreakMode="tailTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="footer">
+                                <fontDescription key="fontDescription" type="boldSystem" pointSize="16"/>
+                                <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            </label>
                         </subviews>
-                        <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+
                         <constraints>
-                            <constraint firstItem="YRO-k0-Ey4" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="1a2-6s-vTC"/>
-                            <constraint firstItem="YRO-k0-Ey4" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" id="4X2-HB-R7a"/>
+                            <!-- Logo1 constraints -->
+                            <constraint firstItem="logo1" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX"/>
+                            <constraint firstItem="logo1" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" constant="-100"/>
+                            <constraint firstItem="logo1" firstAttribute="width" secondItem="Ze5-6b-2t3" secondAttribute="width" multiplier="0.6"/>
+
+                            <!-- Logo2 constraints -->
+                            <constraint firstItem="logo2" firstAttribute="top" secondItem="logo1" secondAttribute="bottom" constant="40"/>
+                            <constraint firstItem="logo2" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX"/>
+                            <constraint firstItem="logo2" firstAttribute="width" secondItem="Ze5-6b-2t3" secondAttribute="width" multiplier="0.4"/>
+
+                            <!-- Star constraints -->
+                            <constraint firstItem="star" firstAttribute="top" secondItem="logo2" secondAttribute="bottom" constant="30"/>
+                            <constraint firstItem="star" firstAttribute="right" secondItem="Ze5-6b-2t3" secondAttribute="right" constant="-60"/>
+                            <constraint firstItem="star" firstAttribute="width" constant="50"/>
+                            <constraint firstItem="star" firstAttribute="height" constant="50"/>
+
+                            <!-- Footer text constraints -->
+                            <constraint firstItem="footer" firstAttribute="bottom" secondItem="Ze5-6b-2t3" secondAttribute="bottom" constant="-40"/>
+                            <constraint firstItem="footer" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX"/>
                         </constraints>
                     </view>
                 </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="iYj-Kq-Ea1" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="53" y="375"/>
         </scene>
     </scenes>
-    <resources>
-        <image name="LaunchImage" width="168" height="185"/>
-    </resources>
 </document>
