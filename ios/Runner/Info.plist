@@ -33,13 +33,13 @@
 	<string>This app needs access to the camera to take pictures.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>This app needs access to the microphone to record audio.</string>
-	<key>UISupportedInterfaceOrientations</key>
 	<key>NSFileProviderDomainUsageDescription</key>
 	<string>This app requires file access to allow users to manage documents.</string>
 	<key>NSFileAccessUsageDescription</key>
 	<string>This app requires access to files for reading and writing content.</string>
 	<key>NSDocumentsFolderUsageDescription</key>
 	<string>This app stores user files in the documents folder for later access.</string>
+	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
 		<string>UIInterfaceOrientationLandscapeLeft</string>
