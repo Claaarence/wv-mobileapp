@@ -17,8 +17,8 @@
 	<string>wvmobile</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
-	<key>UILaunchStoryboardName</key>
-	<string>LaunchScreen</string>
+	<key>UIRequiresFullScreen</key>
+	<true/>
 	<key>CFBundleShortVersionString</key>
 	<string>$(FLUTTER_BUILD_NAME)</string>
 	<key>CFBundleSignature</key>
