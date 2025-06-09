@@ -38,25 +38,24 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      initialRoute: '/',
+      initialRoute: initialRoute, // <- FIXED
       routes: {
-         '/': (context) => const SplashScreen(),
-         '/dashboard': (context) => DashboardPage(),
-         '/login': (context) => LoginPage(),
-         '/home': (context) => HomePage(),
-         '/profile': (context) => ProfilePage(),
-         '/child': (context) => ChildPage(),
-         '/donation': (context) => DonationPage(),
-         '/rewards': (context) => RewardsPage(),
-         '/badges': (context) => BadgesPage(),
-         '/contactus': (context) => ContactUsPage(),
-         '/devotion': (context) => DevotionPage(),
-         '/campaigns': (context) => CampaignsPage(),
-         '/childupdates': (context) => ChildUpdatesPage(),
-         '/community': (context) => CommunityPage(),
-         '/orders': (context) => OrdersPage(),
-
+        '/': (context) => const SplashScreen(),
+        '/dashboard': (context) => DashboardPage(),
+        '/login': (context) => LoginPage(),
+        '/home': (context) => HomePage(),
+        '/profile': (context) => ProfilePage(),
+        '/child': (context) => ChildPage(),
+        '/donation': (context) => DonationPage(),
+        '/rewards': (context) => RewardsPage(),
+        '/badges': (context) => BadgesPage(),
+        '/contactus': (context) => ContactUsPage(),
+        '/devotion': (context) => DevotionPage(),
+        '/campaigns': (context) => CampaignsPage(),
+        '/childupdates': (context) => ChildUpdatesPage(),
+        '/community': (context) => CommunityPage(),
+        '/orders': (context) => OrdersPage(),
       },
     );
-  } 
+  }
 }
