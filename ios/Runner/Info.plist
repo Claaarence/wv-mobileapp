@@ -39,6 +39,8 @@
 	<string>This app requires access to files for reading and writing content.</string>
 	<key>NSDocumentsFolderUsageDescription</key>
 	<string>This app stores user files in the documents folder for later access.</string>
+	<key>UIRequiresFullScreen</key>
+	<true/>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 	  <key>NSAllowsArbitraryLoads</key>
